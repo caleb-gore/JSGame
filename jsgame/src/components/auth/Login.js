@@ -1,19 +1,27 @@
+/* LOGIN EXISTING USER */
+
+// IMPORTS
 import React, { useRef, useState } from "react"
 import { Link, useHistory, useNavigate } from "react-router-dom"
 
-
+// COMPONENT
 export const Login = () => {
-    const username = useRef()
-    const password = useRef()
     const invalidDialog = useRef()
     const navigate = useNavigate()
 
+    /* USER OBJECT TO HOLD USERNAME AND PASSWORD 
+    UNTIL LOGIN IS COMPLETED */
     const [userObj, setUserObj] = useState({
         username: "",
         password: ""
     })
+
+    /* ARRAY USED TO KEEP TRACK OF "PAGES" OF LOGIN PROMPTS 
+    (PAGE IN "TRUE" POSITION IS DISPLAYED) */
     const [currentPage, setCurrentPage] = useState([true, false])
 
+    /* LOGIN USER USING DATA FROM USER OBJ
+    SHOW MODAL IF INVALID LOGIN */
     const handleLogin = (e) => {
         e.preventDefault()
 
@@ -85,37 +93,16 @@ export const Login = () => {
     };
 
     return (
-        <main className="container--login">
+        <main className="container--login" style={{ textAlign: "center" }}>
+            {/* INVALID LOGIN MODAL */}
             <dialog className="dialog dialog--auth" ref={invalidDialog}>
                 <div>Username or password was not valid.</div>
                 <button className="button--close" onClick={e => invalidDialog.current.close()}>Close</button>
             </dialog>
 
+            {/* PAGES */}
             {currentPage[0] ? page1() : <></>}
             {currentPage[1] ? page2() : <></>}
-            
-            {/* <section>
-                <form className="form--login" onSubmit={handleLogin}>
-                    <h1>Level Up</h1>
-                    <h2>Please sign in</h2>
-                    <fieldset>
-                        <label htmlFor="inputUsername"> Username address </label>
-                        <input ref={username} type="username" id="username" className="form-control" placeholder="Username address" required autoFocus />
-                    </fieldset>
-                    <fieldset>
-                        <label htmlFor="inputPassword"> Password </label>
-                        <input ref={password} type="password" id="password" className="form-control" placeholder="Password" required />
-                    </fieldset>
-                    <fieldset style={{
-                        textAlign: "center"
-                    }}>
-                        <button className="btn btn-1 btn-sep icon-send" type="submit">Sign In</button>
-                    </fieldset>
-                </form>
-            </section>
-            <section className="link--register">
-                <Link to="/register">Not a member yet?</Link>
-            </section> */}
         </main>
     )
 }
