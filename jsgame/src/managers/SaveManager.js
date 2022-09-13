@@ -19,3 +19,21 @@ export const getGames = () => {
     })
         .then(response => response.json())
 }
+
+export const getSingleGame = (id) => {
+    return fetch(`http://localhost:8000/games/${id}`, {
+        headers:{
+            "Authorization": `Token ${localStorage.getItem("u_token")}`
+        }
+    })
+        .then(response => response.json())
+}
+
+export const deleteGame = (gameId) => {
+    return fetch(`http://localhost:8000/games/${gameId}`, {
+        method: 'DELETE',
+        headers:{
+            "Authorization": `Token ${localStorage.getItem("u_token")}`
+        }
+    })
+}
