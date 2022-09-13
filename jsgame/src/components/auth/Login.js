@@ -12,8 +12,8 @@ export const Login = () => {
     /* USER OBJECT TO HOLD USERNAME AND PASSWORD 
     UNTIL LOGIN IS COMPLETED */
     const [userObj, setUserObj] = useState({
-        username: "",
-        password: ""
+        username: "admin",
+        password: "admin"
     })
 
     /* ARRAY USED TO KEEP TRACK OF "PAGES" OF LOGIN PROMPTS 
