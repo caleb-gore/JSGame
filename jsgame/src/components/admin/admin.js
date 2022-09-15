@@ -11,6 +11,7 @@ export const Admin = () => {
             <>
                 <h1>Welcome {username}</h1>
                 <button onClick={()=>navigate('/admin/assets')}>Assets</button>
+                <button onClick={()=>navigate('/admin/users')}>Users</button>
             </> 
             : 
             <>You are not authorized to view this page</>}
