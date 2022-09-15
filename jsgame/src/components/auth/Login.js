@@ -3,6 +3,7 @@
 // IMPORTS
 import React, { useRef, useState } from "react"
 import { Link, useHistory, useNavigate } from "react-router-dom"
+import { loginUser } from "../../managers/AuthManager"
 
 // COMPONENT
 export const Login = () => {
@@ -22,32 +23,53 @@ export const Login = () => {
 
     /* LOGIN USER USING DATA FROM USER OBJ
     SHOW MODAL IF INVALID LOGIN */
+
     const handleLogin = (e) => {
         e.preventDefault()
 
-        return fetch("http://127.0.0.1:8000/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                username: userObj.username,
-                password: userObj.password
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                if ("valid" in res && res.valid && "token" in res) {
-                    localStorage.setItem("u_token", res.token)
-                    localStorage.setItem("username", userObj.username)
+        const user = {
+            username: userObj.username,
+            password: userObj.password
+        }
+
+        loginUser(user).then(res => {
+            if ("valid" in res && res.valid) {
+                console.log(res);
+                localStorage.setItem("u_token", res.token)
+                localStorage.setItem("username", res.username)
+                localStorage.setItem("is_staff", res.is_staff)
+                if (res.is_staff) {
+                    navigate("/admin")
+                } else {
                     navigate("/lets_play")
-                }
-                else {
-                    invalidDialog.current.showModal()
-                }
-            })
+                } 
+            } else {
+                invalidDialog.current.showModal()
+            }
+        })
     }
+    // const handleLogin = (e) => {
+    //     e.preventDefault()
+
+    //     return fetch("http://127.0.0.1:8000/login", {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "Accept": "application/json"
+    //         },
+    //         body: JSON.stringify({
+    //             username: userObj.username,
+    //             password: userObj.password
+    //         })
+    //     })
+    //         .then(res => res.json())
+    //         .then(res => {
+    //             if ("valid" in res && res.valid && "token" in res) {
+    //             }
+    //             else {
+    //             }
+    //         })
+    // }
 
     /* SHOW PAGE 1 */
     const page1 = () => {
