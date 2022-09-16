@@ -13,17 +13,6 @@ export const Login = () => {
     const navigate = useNavigate()
 
 
-    /* USER OBJECT TO HOLD USERNAME AND PASSWORD 
-    UNTIL LOGIN IS COMPLETED */
-    // const [userObj, setUserObj] = useState({
-    //     username: "admin",
-    //     password: "admin"
-    // })
-
-    /* ARRAY USED TO KEEP TRACK OF "PAGES" OF LOGIN PROMPTS 
-    (PAGE IN "TRUE" POSITION IS DISPLAYED) */
-    // const [currentPage, setCurrentPage] = useState([true, false])
-
     /* LOGIN USER USING DATA FROM USER OBJ
     SHOW MODAL IF INVALID LOGIN */
 
@@ -40,61 +29,13 @@ export const Login = () => {
                 console.log(res);
                 localStorage.setItem("u_token", res.token)
                 localStorage.setItem("is_staff", res.is_staff)
-                if (res.is_staff) {
-                    navigate("/admin")
-                } else {
-                    navigate("/lets_play")
-                } 
+                navigate("/") 
             } else {
                 invalidDialog.current.showModal()
             }
         })
     }
 
-    
-    
-    // /* SHOW PAGE 1 */
-    // const page1 = () => {
-    //     return (
-    //         <>
-    //             <h3>
-    //                 Hi There! Don't I recognize you? You look familiar! What was your name?
-    //             </h3>
-    //             <input
-    //                 value={userObj.username}
-    //                 onChange={(e) => {
-    //                     let copy = { ...userObj };
-    //                     copy.username = e.target.value;
-    //                     setUserObj(copy);
-    //                 }}
-    //             />
-    //             <button onClick={()=>{
-    //                 setCurrentPage([false,true])
-    //             }}>next</button>
-    //         </>
-    //     );
-    // };
-
-    // /* SHOW PAGE 2 */
-    // const page2 = () => {
-    //     return (
-    //         <>
-    //             <h3>
-    //                 Great to see you again, {userObj.username}! What was that password of yours? Gotta make sure you're actually you!
-    //             </h3>
-    //             <input
-    //                 type="password"
-    //                 value={userObj.password}
-    //                 onChange={(e) => {
-    //                     let copy = { ...userObj };
-    //                     copy.password = e.target.value;
-    //                     setUserObj(copy);
-    //                 }}
-    //             />
-    //             <button onClick={(e)=>{handleLogin(e)}}>next</button>
-    //         </>
-    //     );
-    // };
 
     return (
         <main className="container--login" style={{ textAlign: "center" }}>
@@ -127,9 +68,6 @@ export const Login = () => {
                 <Link to="/register">Not a member yet?</Link>
             </section>
 
-            {/* PAGES
-            {currentPage[0] ? page1() : <></>}
-            {currentPage[1] ? page2() : <></>} */}
         </main>
     )
 }

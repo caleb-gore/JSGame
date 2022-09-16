@@ -11,7 +11,7 @@ import { Authorized } from './views/Authorized';
 export const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<Welcome />} />
+      <Route path="/welcome" element={<Welcome />} />
       <Route path="/login" element={<Login/>}/>
       <Route path="/register" element={<Register />}/>
       <Route path="*" element={
