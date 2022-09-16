@@ -15,6 +15,7 @@ export const NavBar = () => {
                 <button onClick={()=>{
                     localStorage.removeItem("u_token")
                     localStorage.removeItem("is_staff")
+                    localStorage.removeItem("u_id")
                     navigate('/welcome')
                 }}>Logout</button>
             </li>
