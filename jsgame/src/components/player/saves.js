@@ -8,7 +8,7 @@ import {
     deleteGame,
     getGames,
     getSingleGame,
-} from "../managers/SaveManager";
+} from "../../managers/SaveManager";
 
 //COMPONENT
 export const Saves = () => {

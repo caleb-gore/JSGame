@@ -29,6 +29,7 @@ export const Register = () => {
                 if ("token" in res) {
                     localStorage.setItem("u_token", res.token);
                     localStorage.setItem("is_staff", res.is_staff);
+                    localStorage.setItem("u_id", res.id);
                     navigate("/");
                 }
             });
