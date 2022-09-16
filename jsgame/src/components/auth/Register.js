@@ -12,7 +12,7 @@ export const Register = () => {
     const verifyPassword = useRef();
     const passwordDialog = useRef();
     const navigate = useNavigate();
-
+    const [is_staff, setIsStaff] = useState("")
     /* SAVE REGISTRATION DATA AS NEW USER OBJECT
     CALL REGISTER USER FUNCTION
     SHOW MODAL IF PASSWORDS DON'T MATCH */
@@ -23,14 +23,12 @@ export const Register = () => {
             const newUser = {
                 username: username.current.value,
                 password: password.current.value,
+                is_staff: is_staff
             };
 
             registerUser(newUser).then((res) => {
                 if ("token" in res) {
-                    localStorage.setItem("u_token", res.token);
-                    localStorage.setItem("is_staff", res.is_staff);
-                    localStorage.setItem("u_id", res.id);
-                    navigate("/");
+                    navigate("/login");
                 }
             });
         } else {
@@ -40,6 +38,12 @@ export const Register = () => {
 
     return (
         <main style={{ textAlign: "center" }}>
+            {is_staff === "" ? <><h3>Choose A Path</h3><button onClick={()=>{
+                setIsStaff(false)
+            }}>player</button><button onClick={()=>{
+                setIsStaff(true)
+            }}>creator</button></> :
+            <>
             {/* PASSWORD MISMATCH MODAL */}
             <dialog className="dialog dialog--password" ref={passwordDialog}>
                 <div>Passwords do not match</div>
@@ -56,8 +60,13 @@ export const Register = () => {
                     className="column is-two-thirds"
                     onSubmit={handleRegister}
                 >
-                    <h1 className="title">GAME TITLE</h1>
-                    <p className="subtitle">Create an account</p>
+                    <h1 className="title">Your Game Here</h1>
+                    <p className="subtitle">Create a {is_staff ? "creator" : "player"} account</p>
+                    {is_staff ? <button onClick={()=>{
+                        password.current.value = verifyPassword.current.value
+                        setIsStaff(false)}}>switch to player</button> : <button onClick={()=>{
+                        password.current.value = verifyPassword.current.value
+                        setIsStaff(true)}}>switch to creator</button>}
                     <div className="field">
                         <label className="label">Username</label>
                         <div className="control">
@@ -113,6 +122,7 @@ export const Register = () => {
                     </div>
                 </form>
             </section>
+            </>}
 
         </main>
     );
