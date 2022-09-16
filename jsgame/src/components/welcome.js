@@ -5,7 +5,7 @@ export const Welcome = () => {
     
     return (
         <>
-            <h1>Welcome Page</h1>
+            <h1>Your Game Here</h1>
             <button onClick={()=> navigate("/register")}>New Player</button>
             <button onClick={()=> navigate("/login")}>Returning Player</button>
         </>
