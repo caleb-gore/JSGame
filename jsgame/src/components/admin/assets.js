@@ -18,6 +18,7 @@ export const Assets = () => {
         "character",
         "enemy",
         "collectable",
+        "other"
     ];
     useEffect(() => {
         getAssets().then(setAssets);
