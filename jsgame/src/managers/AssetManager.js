@@ -19,6 +19,16 @@ export const getAssets = () => {
     })
         .then(response => response.json())
 }
+
+export const getSingleAsset = (id) => {
+    return fetch(`http://localhost:8000/assets/${id}`, {
+        headers:{
+            "Authorization": `Token ${localStorage.getItem("u_token")}`
+        }
+    })
+        .then(response => response.json())
+}
+
 export const deleteAsset = (assetId) => {
     return fetch(`http://localhost:8000/assets/${assetId}`, {
         method: 'DELETE',

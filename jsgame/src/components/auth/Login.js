@@ -48,7 +48,7 @@ export const Login = () => {
 
             <section>
                 <form className="form--login" onSubmit={handleLogin}>
-                    <h1>DEFAULT GAME NAME TEXT</h1>
+                    <h1>Your Game Here</h1>
                     <h2>Please sign in</h2>
                     <fieldset>
                         <label htmlFor="inputUsername"> Username address </label>

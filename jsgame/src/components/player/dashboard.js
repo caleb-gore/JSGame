@@ -23,8 +23,12 @@ export const Dashboard = () => {
     <h4>Your Games</h4>
     <p>Have a game code? enter it <button onClick={()=>gameCodeDialog.current.showModal()}>here</button></p>
     <ul>
-        <li>Game Title <button>play</button></li>
-        <li>Game Title <button>play</button></li>
+        <li> Point And Shoot <button onClick={()=>{
+            localStorage.setItem("game","pointandshoot")
+            navigate('/game')}}>play</button></li>
+        <li> Flappy <button onClick={()=>{
+            localStorage.setItem("game","clickjump")
+            navigate('/game')}}>play</button></li>
         <li>Game Title <button>play</button></li>
     </ul>
 

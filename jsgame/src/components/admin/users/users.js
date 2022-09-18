@@ -12,7 +12,6 @@ export const Users = () => {
 
     const listOfUsers = () => {
         return allUsers.map(user => {
-
             return (
                 <li key={`user--${user.id}`}>
                     {user.username}
