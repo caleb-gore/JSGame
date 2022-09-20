@@ -26,10 +26,13 @@ export const Dashboard = () => {
         <li> Point And Shoot <button onClick={()=>{
             localStorage.setItem("game","pointandshoot")
             navigate('/game')}}>play</button></li>
-        <li> Flappy <button onClick={()=>{
+        <li> Click And Jump <button onClick={()=>{
             localStorage.setItem("game","clickjump")
             navigate('/game')}}>play</button></li>
-        <li>Game Title <button>play</button></li>
+        <li> Side Scroll <button onClick={()=>{
+            localStorage.setItem("game","sidescroll")
+            navigate('/game')}}>play</button></li>
+        
     </ul>
 
     <dialog ref={gameCodeDialog}>

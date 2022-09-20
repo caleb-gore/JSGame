@@ -14,6 +14,9 @@ export const NavBar = () => {
             <li>
                 <Link to="/assets">Assets</Link>
             </li>
+            <li>
+                <Link to="/games">Games</Link>
+            </li>
             {user.is_superuser ? <li>
                 <Link to="/users">Users</Link>
             </li> : ""}

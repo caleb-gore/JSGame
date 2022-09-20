@@ -4,10 +4,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    createGame,
-    deleteGame,
-    getGames,
-    getSingleGame,
+    createSave,
+    deleteSave,
+    getSaves,
+    getSingleSave,
 } from "../../managers/SaveManager";
 
 //COMPONENT
@@ -30,7 +30,7 @@ export const Saves = () => {
 
     //GET GAMES FROM DATABASE (INITIAL STATE)
     useEffect(() => {
-        getGames().then(setSaveGames);
+        getSaves().then(setSaveGames);
     }, []);
 
     //CREATE SAVE SLOT UI
@@ -65,8 +65,8 @@ export const Saves = () => {
                     <button
                         onClick={() => {
                             //CREATE NEW GAME OBJECT TO SEND TO DATABASE
-                            createGame(newGame).then(() =>
-                                getGames()
+                            createSave(newGame).then(() =>
+                                getSaves()
                                     .then(setSaveGames)
                                     .then(() =>
                                         localStorage.setItem(
@@ -144,8 +144,8 @@ export const Saves = () => {
                         confirmDeleteDialog.current.close();
                         deleteDialog.current.close();
                         // DELETE GAME, GET GAMES, CLEAR FILE TO BE DELETED
-                        deleteGame(fileToBeDeleted.id)
-                            .then(() => getGames().then(setSaveGames))
+                        deleteSave(fileToBeDeleted.id)
+                            .then(() => getSaves().then(setSaveGames))
                             .then(() => setFileToBeDeleted({}));
                     }}
                 >

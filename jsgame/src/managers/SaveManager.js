@@ -1,18 +1,18 @@
-export const createGame = (game) => {
-    return fetch("http://localhost:8000/games", {
+export const createSave = (save) => {
+    return fetch("http://localhost:8000/saves", {
         method: 'POST',
         headers:{
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Authorization": `Token ${localStorage.getItem("u_token")}`
         },
-        body: JSON.stringify(game)
+        body: JSON.stringify(save)
     })
         .then(response => response.json())
 }
 
-export const getGames = () => {
-    return fetch("http://localhost:8000/games", {
+export const getSaves = () => {
+    return fetch("http://localhost:8000/saves", {
         headers:{
             "Authorization": `Token ${localStorage.getItem("u_token")}`
         }
@@ -20,8 +20,8 @@ export const getGames = () => {
         .then(response => response.json())
 }
 
-export const getSingleGame = (id) => {
-    return fetch(`http://localhost:8000/games/${id}`, {
+export const getSingleSave = (id) => {
+    return fetch(`http://localhost:8000/saves/${id}`, {
         headers:{
             "Authorization": `Token ${localStorage.getItem("u_token")}`
         }
@@ -29,8 +29,21 @@ export const getSingleGame = (id) => {
         .then(response => response.json())
 }
 
-export const deleteGame = (gameId) => {
-    return fetch(`http://localhost:8000/games/${gameId}`, {
+export const updateSaveGame = (save, id) => {
+    return fetch(`http://localhost:8000/saves/${id}`, {
+        method: 'PUT',
+        headers:{
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Token ${localStorage.getItem("u_token")}`
+        },
+        body: JSON.stringify(save)
+    })
+        .then(response => response.json())
+}
+
+export const deleteSave = (saveId) => {
+    return fetch(`http://localhost:8000/saves/${saveId}`, {
         method: 'DELETE',
         headers:{
             "Authorization": `Token ${localStorage.getItem("u_token")}`

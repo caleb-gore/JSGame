@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
 
@@ -6,8 +7,11 @@ export const PointAndShoot = () => {
     const [assets, setAssets] = useState([])
     const [enemyAsset, setEnemyAsset] = useState("")
     const [explosionAsset, setExplosionAsset] = useState("")
+    const [selectedEnemy, setSelectedEnemy] = useState("")
+    const [selectedExplosion, setSelectedExplosion] = useState("")
     const canvas1 = useRef();
     const canvas2 = useRef();
+    const navigate = useNavigate()
 
     useEffect(() => {
         getAssets().then(setAssets)
@@ -40,13 +44,12 @@ export const PointAndShoot = () => {
         let score = 0;
         let gameOver = false;
         ctx.font = "50px impact";
-
-        let timeToNextRaven = 0;
-        let ravenInterval = 2000;
+        let timeToNextEnemy = 0;
+        let enemyInterval = 2000;
         let lastTime = 0;
 
-        let ravens = [];
-        class Raven {
+        let enemies = [];
+        class Enemy {
             constructor() {
                 this.spriteWidth = enemyAsset.width;
                 this.spriteHeight = enemyAsset.height;
@@ -62,8 +65,8 @@ export const PointAndShoot = () => {
                 this.image.src = `http://localhost:8000${enemyAsset.file}`;
                 this.frame = 0;
                 this.maxFrame = 4;
-                this.timeSinceFlap = 0;
-                this.flapInterval = Math.random() * 50 + 50;
+                this.timeSinceAnimation = 0;
+                this.animationInterval = Math.random() * 50 + 50;
                 this.randomColors = [
                     Math.floor(Math.random() * 255),
                     Math.floor(Math.random() * 255),
@@ -71,18 +74,18 @@ export const PointAndShoot = () => {
                 ];
                 this.color = `rgb(${this.randomColors[0]},${this.randomColors[1]},${this.randomColors[2]})`;
             }
-            update(deltatime) {
+            update(deltaTime) {
                 if (this.y < 0 || this.y > canvas.height - this.height) {
                     this.directionY = this.directionY * -1;
                 }
                 this.x -= this.directionX;
                 this.y += this.directionY;
                 if (this.x < 0 - this.width) this.markedForDeletion = true;
-                this.timeSinceFlap += deltatime;
-                if (this.timeSinceFlap > this.flapInterval) {
+                this.timeSinceAnimation += deltaTime;
+                if (this.timeSinceAnimation > this.animationInterval) {
                     if (this.frame > this.maxFrame) this.frame = 0;
                     else this.frame++;
-                    this.timeSinceFlap = 0;
+                    this.timeSinceAnimation = 0;
                     // particles.push(new Particle(this.x, this.y, this.width, this.color))
                 }
                 if (this.x < 0 - this.width) gameOver = true;
@@ -113,16 +116,16 @@ export const PointAndShoot = () => {
                 this.size = size;
                 this.x = x;
                 this.y = y;
-                // this.frame = 0;
+                this.frame = 0;
                 // this.sound = new Audio();
                 // this.sound.src = "../media/explosions/boom.wav";
                 this.timeSinceLastFrame = 0;
                 this.frameInterval = 200;
                 this.markedForDeletion = false;
             }
-            update(deltatime) {
+            update(deltaTime) {
                 // if (this.frame === 0) this.sound.play();
-                this.timeSinceLastFrame += deltatime;
+                this.timeSinceLastFrame += deltaTime;
                 if (this.timeSinceLastFrame > this.frameInterval) {
                     this.frame++;
                     this.timeSinceLastFrame = 0;
@@ -176,6 +179,12 @@ export const PointAndShoot = () => {
             ctx.fillText("Score: " + score, 55, 80);
         }
 
+        function drawEndGame() {
+            ctx.fillStyle = "black";
+            ctx.fillText("[ESC] to exit", 50, 140);
+            ctx.fillStyle = "white";
+            ctx.fillText("[ESC] to exit", 55, 145);
+        }
         function drawGameOver() {
             ctx.textAlign = "center";
             ctx.fillStyle = "black";
@@ -196,7 +205,7 @@ export const PointAndShoot = () => {
             const detectPixelColor = collisionCtx.getImageData(e.x, e.y, 1, 1);
             console.log(detectPixelColor);
             const pc = detectPixelColor.data;
-            ravens.forEach((object) => {
+            enemies.forEach((object) => {
                 if (
                     object.randomColors[0] === pc[0] &&
                     object.randomColors[1] === pc[1] &&
@@ -207,7 +216,7 @@ export const PointAndShoot = () => {
                     explosions.push(
                         new Explosion(object.x, object.y, object.width)
                     );
-                    ravenInterval -= 25;
+                    enemyInterval -= 25;
                 }
             });
         });
@@ -215,22 +224,23 @@ export const PointAndShoot = () => {
         function animate(timestamp) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             collisionCtx.clearRect(0, 0, canvas.width, canvas.height);
-            let deltatime = timestamp - lastTime;
+            let deltaTime = timestamp - lastTime;
             lastTime = timestamp;
-            timeToNextRaven += deltatime;
-            if (timeToNextRaven > ravenInterval) {
-                ravens.push(new Raven());
-                timeToNextRaven = 0;
-                ravens.sort(function (a, b) {
+            timeToNextEnemy += deltaTime;
+            if (timeToNextEnemy > enemyInterval) {
+                enemies.push(new Enemy());
+                timeToNextEnemy = 0;
+                enemies.sort(function (a, b) {
                     return a.width - b.width;
                 });
             }
             drawScore();
-            [...ravens, ...explosions]?.forEach((object) =>
-                object.update(deltatime)
+            drawEndGame();
+            [...enemies, ...explosions]?.forEach((object) =>
+                object.update(deltaTime)
             );
-            [...ravens, ...explosions]?.forEach((object) => object.draw());
-            ravens = ravens.filter((object) => !object.markedForDeletion);
+            [...enemies, ...explosions]?.forEach((object) => object.draw());
+            enemies = enemies.filter((object) => !object.markedForDeletion);
             explosions = explosions.filter(
                 (object) => !object.markedForDeletion
             );
@@ -241,8 +251,13 @@ export const PointAndShoot = () => {
 
     },[enemyAsset, explosionAsset])
 
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            navigate('/')
+        }
+    })  
     return (
-        <Main>
+        <Main >
             <Canvas ref={canvas1}></Canvas>
             <Canvas style={{"opacity": 0}}ref={canvas2}></Canvas>
         </Main>
