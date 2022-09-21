@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
-import { Welcome } from './components/welcome';
+import { Welcome } from './components/welcome/welcome';
 import { ApplicationViews } from './views/ApplicationViews';
 import { Authorized } from './views/Authorized';
 

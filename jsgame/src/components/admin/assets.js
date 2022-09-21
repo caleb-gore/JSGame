@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import { deleteAsset, getAssets, saveAsset } from "../../managers/AssetManager";
+import { Collapsible } from "../collapsible";
 
 export const Assets = () => {
     const navigate = useNavigate();
@@ -49,14 +51,14 @@ export const Assets = () => {
             let categoryAssets = assets.filter((asset) => asset.type === cat);
             if (!categoryAssets[0]) {
                 return (
-                    <section key={cat}>
+                    <Collapsible label={cat} key={cat}>
                         <h4>{cat}</h4>
                         <p>No Assets Uploaded</p>
-                    </section>
+                    </Collapsible>
                 );
             } else {
                 return (
-                    <section key={cat}>
+                    <Collapsible label={cat} key={cat}>
                         <h4 key={cat}>{cat}</h4>
                         <ul>
                             {categoryAssets.map((asset) => {
@@ -77,13 +79,30 @@ export const Assets = () => {
                                 );
                             })}
                         </ul>
-                    </section>
+                    </Collapsible>
                 );
             }
         });
     };
 
+
+
     return (
+        <Main>
+            {/* <div className="App">
+    <Collapsible label="Introduction">
+    <h1>introduction</h1>
+  <p>
+    The collapsible component puts long sections of the information under a
+    block enabling users to expand or collapse to access its details.
+  </p>
+    </Collapsible>
+
+    <hr />
+    <Collapsible label="Prerequesite"/>
+    <hr />
+    <Collapsible label="Goals"/>
+    </div> */}
         <>
             <h3>Assets</h3>
 
@@ -158,5 +177,10 @@ export const Assets = () => {
                 </button>
             </form>
         </>
+        </Main>
     );
 };
+
+const Main = styled.main`
+margin-top: 100px;
+`

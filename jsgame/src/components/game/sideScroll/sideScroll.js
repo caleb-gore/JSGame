@@ -1,54 +1,61 @@
-import { FormControlUnstyledContext, TabsContext } from "@mui/base";
 import { useEffect, useRef, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
-import { createSave, updateSaveGame } from "../../../managers/SaveManager";
+import { getSaves, getSingleSave, updateSaveGame } from "../../../managers/SaveManager";
+import { getTrophies } from "../../../managers/TrophyManager";
 
 export const SideScroll = () => {
+    const navigate = useNavigate();
     const canvas1 = useRef();
+    const saveId = JSON.parse(localStorage.getItem("saveGame"));
 
     /* asset objects from database */
     const [assets, setAssets] = useState([]);
+    const [trophies, setTrophies] = useState([]);
+    const [saveGame, setSaveGame] = useState({});
     const [characterAsset, setCharacter] = useState({});
     const [backgroundAsset, setBackground] = useState({});
     const [enemyAsset, setEnemy] = useState({});
-    const [save, updateSave] = useState({
-        score: 0,
-        level: 1,
-        lives: 3,
-        game_over: false,
-    });
 
     const inputs = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
 
     useEffect(() => {
         getAssets().then(setAssets);
+        getTrophies().then(setTrophies)
+        getSingleSave(saveId).then(setSaveGame);
     }, []);
+
+    
 
     useEffect(() => {
         assets.map((asset) => {
             if (asset.name === "dog") {
                 setCharacter(asset);
-            } else if (asset.name === "forest") {
+            } else if (asset.name === "autumn") {
                 setBackground(asset);
-            } else if (asset.name === "worm") {
+            } else if (asset.name === "ghost") {
                 setEnemy(asset);
             }
         });
-    }, [assets]);
+
+    }, [assets, saveGame, trophies]);
 
     /* run game after all assets are set */
     useEffect(() => {
+        if (saveGame.score) {
+
+        
         const canvas = canvas1.current;
         const ctx = canvas.getContext("2d");
-        canvas.width = 800;
-        canvas.height = 720;
+        canvas.width = window.innerWidth - 2;
+        canvas.height = window.innerHeight - 2
         let enemies = [];
-        let score = save.score;
-        let lives = save.lives;
+        let score = saveGame.score;
+        let lives = saveGame.lives;
         let roundOver = false;
-        let gameOver = save.game_over;
+        let level = saveGame.level
+        let gameOver = saveGame.game_over;
         /* handles keypress events */
         class InputHandler {
             constructor() {
@@ -120,8 +127,6 @@ export const SideScroll = () => {
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < this.width / 2 + enemy.width / 2) {
                         roundOver = true;
-                    
-                    
                     }
                 });
 
@@ -182,9 +187,9 @@ export const SideScroll = () => {
                 this.image.src = "http://localhost:8000" + backgroundAsset.file;
                 this.x = 0;
                 this.y = 0;
-                this.width = backgroundAsset.width;
-                this.height = backgroundAsset.height;
-                this.speed = 20;
+                this.width = backgroundAsset.width * (this.gameHeight / backgroundAsset.height);
+                this.height = this.gameHeight;
+                this.speed = 10;
             }
             draw(context) {
                 context.drawImage(
@@ -197,6 +202,13 @@ export const SideScroll = () => {
                 context.drawImage(
                     this.image,
                     this.x + this.width - this.speed,
+                    this.y,
+                    this.width,
+                    this.height
+                );
+                context.drawImage(
+                    this.image,
+                    this.x + this.width * 2 - this.speed,
                     this.y,
                     this.width,
                     this.height
@@ -221,7 +233,7 @@ export const SideScroll = () => {
                 this.x = this.gameWidth;
                 this.y = this.gameHeight - this.height;
                 this.frameX = 0;
-                this.maxFrame = 5;
+                this.maxFrame = 10;
                 this.fps = 20;
                 this.frameTimer = 0;
                 this.frameInterval = 1000 / this.fps;
@@ -249,7 +261,7 @@ export const SideScroll = () => {
                     this.x,
                     this.y,
                     this.width,
-                    this.height
+                    this.height 
                 );
             }
             update(deltaTime) {
@@ -284,22 +296,38 @@ export const SideScroll = () => {
             enemies = enemies.filter((enemy) => !enemy.markedForDeletion);
         };
 
+        const handleTrophies = () => {
+            // if a player reaches 20 points without losing a life, they win trophy 1
+            if (score =
+                + 20 && !saveGame?.awarded_trophies?.includes(1)) {
+               
+            }
+        }
+
+        const displayLevel = (context) => {
+            context.font = "40px 'Bungee Spice', cursive"
+            context.fillStyle = "white";
+            context.fillText(`Level ${level}`, canvas.width / 2 - 100, canvas.height / 2);
+        }
+
         const displayStatusText = (context) => {
-            context.font = "40px Helvetica";
+            context.font = "40px 'Bungee Spice', cursive";
             context.fillStyle = "black";
             context.fillText("Score: " + score, 20, 50);
-            context.fillStyle = "white";
-            context.fillText("Score: " + score, 22, 52);
+           
             context.fillStyle = "black";
-            context.fillText("Lives: " + lives, canvas.width - 150, 50);
-            context.fillStyle = "white";
-            context.fillText("Lives: " + lives, canvas.width - 152, 52);
-            if (roundOver) {
+            context.fillText("Lives: " + lives, canvas.width - 200, 50);
+            
+            if (roundOver && lives > 0) {
                 context.textAlign = "center";
                 context.fillStyle = "black";
                 context.fillText("try again", canvas.width / 2, 200);
-                context.fillStyle = "white";
-                context.fillText("try again", canvas.width / 2 + 2, 202);
+                
+            } else if (roundOver && lives == 0) {
+                context.textAlign = "center";
+                context.fillStyle = "black";
+                context.fillText("game over", canvas.width / 2, 200);
+                
             }
         };
 
@@ -311,62 +339,74 @@ export const SideScroll = () => {
         let enemyTimer = 0;
         let enemyInterval = 1000;
         let randomEnemyInterval = Math.random() * 3000 + 1000;
+        
+        // if (score % 20 === 0 && score > 0) {
+        //     level++;
+        //     enemyInterval -= 100;
+        // }
+        let scoreUpdated = false
 
         const animate = (timestamp) => {
             const deltaTime = timestamp - lastTime;
             lastTime = timestamp;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             background.draw(ctx);
-            // background.update()
+            background.update()
             player.draw(ctx);
             player.update(input, deltaTime, enemies);
             handleEnemies(deltaTime);
+            if (score === 0 && level === 1) {
+               displayLevel(ctx)
+            } else if (score % 5 === 0 && score > 0) {
+                if (!scoreUpdated) {
+                    level++;
+                    enemyInterval -= 100;
+                    scoreUpdated = true;
+                }
+                displayLevel(ctx)
+            } else {
+                scoreUpdated = false
+            }
             displayStatusText(ctx);
             if (!roundOver) requestAnimationFrame(animate);
+            else if (roundOver && lives > 0) {
+                lives -= 1;
+                const copy = { ...saveGame };
+                copy.score = score;
+                copy.lives = lives;
+                copy.level = level;
+                updateSaveGame(copy, saveId);
+                setTimeout(() => {
+                    roundOver = false;
+                }, 2000);
+            } else {
+                const copy = { ...saveGame };
+                copy.score = score;
+                copy.level = level;
+                copy.game_over = true;
+                updateSaveGame(copy, saveId)
+                    setTimeout(() => {
+                        navigate("/");
+                    }, 2000)
+            }
         };
         animate(0);
-
-        window.addEventListener('click', (e) => {
-            if (roundOver && lives > 0) {
-                const copy = {...save}
-                copy.score = score
-                copy.lives = lives - 1
-                updateSave(copy)
-
-            } else if (roundOver && lives <= 0) {
-                const copy = {...save}
-                copy.score = score
-                copy.gameOver = true
-                updateSave(copy)
-
-                
-            }
-        })
-    }, [characterAsset, backgroundAsset, enemyAsset, save]);
+    }
+    }, [characterAsset, backgroundAsset, enemyAsset]);
 
     return (
-        <Main>
             <Canvas ref={canvas1}></Canvas>
-            {/* <Img
-                ref={characterImage}
-                src={`http://localhost:8000${characterAsset.file}`}
-            ></Img>
-            <Img
-                ref={backgroundImage}
-                src={`http://localhost:8000${backgroundAsset.file}`}
-            ></Img>
-            <Img
-                ref={enemyImage}
-                src={`http://localhost:8000${enemyAsset.file}`}
-            ></Img> */}
-        </Main>
+        // <Main>
+        // </Main>
     );
 };
 
 const Main = styled.div`
+box-sizing: border-box;
     background: black;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 `;
 const Canvas = styled.canvas`
     border: 1px solid white;
@@ -374,8 +414,20 @@ const Canvas = styled.canvas`
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    overflow: hidden;
 `;
 
 const Img = styled.img`
     display: none;
+`;
+const TryAgain = styled.button`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 40px;
+    font-family: Helvetica;
 `;

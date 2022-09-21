@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import styled from "styled-components"
 import { getAllUsers } from "../../../managers/UserManager"
 import { UserDetails } from "./userDetails"
 
@@ -29,11 +30,15 @@ export const Users = () => {
     }
 
     return (
-        <>
+        <Main>
             <ul>
                 {listOfUsers()}
                 
             </ul>
-        </>
+        </Main>
     )
 }
+
+const Main = styled.main`
+margin-top: 100px;
+`

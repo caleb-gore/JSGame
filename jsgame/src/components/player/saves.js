@@ -3,6 +3,7 @@
 //IMPORTS
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import {
     createSave,
     deleteSave,
@@ -19,6 +20,7 @@ export const Saves = () => {
     const [saveGames, setSaveGames] = useState([]);
     //HOLD SELECTED OBJECT TO BE DELETED
     const [fileToBeDeleted, setFileToBeDeleted] = useState({});
+    // const userId = JSON.parse(localStorage.getItem("u_id"));
 
     //NEW GAME OBJECT
     const newGame = {
@@ -41,8 +43,8 @@ export const Saves = () => {
         NAVIGATE TO GAME */
         if (saveGames[i - 1]) {
             return (
-                <section>
-                    <button
+                <SaveSlot>
+                    <Button
                         onClick={() => {
                             localStorage.setItem(
                                 "saveGame",
@@ -52,17 +54,17 @@ export const Saves = () => {
                         }}
                     >
                         Play
-                    </button>
+                    </Button>
                     <div>
                         <p>Slot {i}</p>
                         <p>Score: {saveGames[i - 1].score}</p>
                     </div>
-                </section>
+                </SaveSlot>
             );
         } else {
             return (
-                <section>
-                    <button
+                <SaveSlot>
+                    <Button
                         onClick={() => {
                             //CREATE NEW GAME OBJECT TO SEND TO DATABASE
                             createSave(newGame).then(() =>
@@ -79,12 +81,12 @@ export const Saves = () => {
                         }}
                     >
                         NEW
-                    </button>
+                    </Button>
                     <div>
                         <p>Slot {i}</p>
                         <p>NEW</p>
                     </div>
-                </section>
+                </SaveSlot>
             );
         }
     };
@@ -119,7 +121,7 @@ export const Saves = () => {
     };
 
     return (
-        <>
+        <Main>
             {/* DELETE BUTTON MODAL */}
             <dialog className="dialog dialog--delete" ref={deleteDialog}>
                 <div>Choose A File To Delete:</div>
@@ -163,13 +165,89 @@ export const Saves = () => {
                 </button>
             </dialog>
 
-            <h2>Save Files</h2>
+            <Title>Save Files</Title>
 
             {/* SHOW SAVE SLOTS */}
+            <SaveContainer>
             {saveSlotMaker()}
-            <button onClick={() => deleteDialog.current.showModal()}>
+            </SaveContainer>
+            <Div>
+
+            <Button onClick={() => deleteDialog.current.showModal()}>
                 Delete File
-            </button>
-        </>
+            </Button>
+            <Button onClick={() => {
+               localStorage.removeItem("u_token")
+               localStorage.removeItem("is_staff")
+               localStorage.removeItem("u_id")
+                navigate("/welcome");
+            }}>Logout</Button>
+            </Div>
+        </Main>
     );
 };
+
+const Div = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+`
+
+const Title = styled.h1`
+text-align: center;
+font-family: 'Bungee Spice', cursive;
+font-size: 35px;
+z-index: 2;
+`
+
+const SaveSlot = styled.section`
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+background-color: grey;
+border-radius: 10px;
+width: 200px;
+height: 200px;
+margin: 30px 100px;
+`
+const SaveContainer = styled.div`
+display: flex;
+flex-direction: row;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+`
+
+const Button = styled.button`
+z-index: 2;
+display:inline-block;
+padding:0.35em 1.2em;
+border:0.1em solid #FFFFFF;
+margin:0 0.3em 0.3em 0;
+border-radius:0.12em;
+box-sizing: border-box;
+text-decoration:none;
+font-family:'Roboto',sans-serif;
+font-weight:300;
+font-size: 20px;
+color:#FFFFFF;
+background-color:transparent;
+text-align:center;
+transition: all 0.2s;
+&:hover{
+    color:#000000;
+    background-color:#FFFFFF;
+}
+`
+
+const Main = styled.main`
+display: flex;
+flex-direction: column;
+background-color: rgba(0,0,0,0.2);
+height: 100vh;
+padding: 20px;
+z-index: 2;    
+
+`
