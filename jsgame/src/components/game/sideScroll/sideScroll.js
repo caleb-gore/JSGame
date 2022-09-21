@@ -2,13 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
-import { getSaves, getSingleSave, updateSaveGame } from "../../../managers/SaveManager";
+import {
+    getSaves,
+    getSingleSave,
+    updateSaveGame,
+} from "../../../managers/SaveManager";
 import { getTrophies } from "../../../managers/TrophyManager";
 
+// check if awarded_trophy is empty
+//if not empty, save trophy awarded to state
+//if !trophy1 and score is >= 20 and lives = 3, award trophy1
+//if !trophy2 and score is >= 50 and lives = 3, award trophy2
+//if !trophy3 and score is >= 100 and lives = 3, award trophy3
 export const SideScroll = () => {
     const navigate = useNavigate();
     const canvas1 = useRef();
-    const saveId = JSON.parse(localStorage.getItem("saveGame"));
 
     /* asset objects from database */
     const [assets, setAssets] = useState([]);
@@ -17,45 +25,58 @@ export const SideScroll = () => {
     const [characterAsset, setCharacter] = useState({});
     const [backgroundAsset, setBackground] = useState({});
     const [enemyAsset, setEnemy] = useState({});
-
-    const inputs = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+    const [saveId, setSaveId] = useState(0);
+    const inputs = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", 'Escape ', 'Enter'];
 
     useEffect(() => {
+        setSaveId(JSON.parse(localStorage.getItem("saveGame")));
         getAssets().then(setAssets);
-        getTrophies().then(setTrophies)
-        getSingleSave(saveId).then(setSaveGame);
+        getTrophies().then(setTrophies);
     }, []);
 
-    
+    useEffect(() => {
+        if (saveId > 0) {
+            getSingleSave(saveId).then(setSaveGame);
+        }
+    }, [saveId]);
 
     useEffect(() => {
-        assets.map((asset) => {
-            if (asset.name === "dog") {
-                setCharacter(asset);
-            } else if (asset.name === "autumn") {
-                setBackground(asset);
-            } else if (asset.name === "ghost") {
-                setEnemy(asset);
-            }
-        });
-
+        if (saveGame.id > 0) {
+            assets.map((asset) => {
+                if (asset.name === "dog") {
+                    setCharacter(asset);
+                } else if (asset.name === "autumn") {
+                    setBackground(asset);
+                } else if (asset.name === "ghost") {
+                    setEnemy(asset);
+                }
+            });
+        }
     }, [assets, saveGame, trophies]);
 
     /* run game after all assets are set */
     useEffect(() => {
-        if (saveGame.score) {
+        if (
+            characterAsset.id > 0 &&
+            backgroundAsset.id > 0 &&
+            enemyAsset.id > 0
+        ) {
+            runGame();
+        }
+    }, [characterAsset, backgroundAsset, enemyAsset, saveGame]);
 
-        
+    const runGame = () => {
         const canvas = canvas1.current;
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth - 2;
-        canvas.height = window.innerHeight - 2
+        canvas.height = window.innerHeight - 2;
         let enemies = [];
         let score = saveGame.score;
         let lives = saveGame.lives;
         let roundOver = false;
-        let level = saveGame.level
+        let level = saveGame.level;
         let gameOver = saveGame.game_over;
+        let endedByUser = false;
         /* handles keypress events */
         class InputHandler {
             constructor() {
@@ -63,6 +84,7 @@ export const SideScroll = () => {
                 window.addEventListener("keydown", (e) => {
                     if (inputs.includes(e.key) && !this.keys.includes(e.key)) {
                         this.keys.push(e.key);
+                        console.log(this.keys);
                     }
                 });
                 window.addEventListener("keyup", (e) => {
@@ -71,6 +93,7 @@ export const SideScroll = () => {
                     }
                 });
             }
+            8
         }
 
         class Character {
@@ -187,7 +210,9 @@ export const SideScroll = () => {
                 this.image.src = "http://localhost:8000" + backgroundAsset.file;
                 this.x = 0;
                 this.y = 0;
-                this.width = backgroundAsset.width * (this.gameHeight / backgroundAsset.height);
+                this.width =
+                    backgroundAsset.width *
+                    (this.gameHeight / backgroundAsset.height);
                 this.height = this.gameHeight;
                 this.speed = 10;
             }
@@ -261,7 +286,7 @@ export const SideScroll = () => {
                     this.x,
                     this.y,
                     this.width,
-                    this.height 
+                    this.height
                 );
             }
             update(deltaTime) {
@@ -297,44 +322,93 @@ export const SideScroll = () => {
         };
 
         const handleTrophies = () => {
-            // if a player reaches 20 points without losing a life, they win trophy 1
-            if (score =
-                + 20 && !saveGame?.awarded_trophies?.includes(1)) {
-               
-            }
-        }
+        };
 
         const displayLevel = (context) => {
-            context.font = "40px 'Bungee Spice', cursive"
+            context.font = "40px 'Bungee Spice', cursive";
             context.fillStyle = "white";
-            context.fillText(`Level ${level}`, canvas.width / 2 - 100, canvas.height / 2);
-        }
+            context.fillText(
+                `Level ${level}`,
+                canvas.width / 2 - 100,
+                canvas.height / 2
+            );
+        };
 
         const displayStatusText = (context) => {
             context.font = "40px 'Bungee Spice', cursive";
             context.fillStyle = "black";
             context.fillText("Score: " + score, 20, 50);
-           
+
             context.fillStyle = "black";
             context.fillText("Lives: " + lives, canvas.width - 200, 50);
-            
+
             if (roundOver && lives > 0) {
                 context.textAlign = "center";
                 context.fillStyle = "black";
-                context.fillText("try again", canvas.width / 2, 200);
-                
-            } else if (roundOver && lives == 0) {
+                context.fillText(
+                    "You Died! Press [enter] to try again. Press [esc] to quit",
+                    canvas.width / 2,
+                    200
+                    );
+                } else if (roundOver && lives == 0) {
                 context.textAlign = "center";
                 context.fillStyle = "black";
-                context.fillText("game over", canvas.width / 2, 200);
-                
+                context.fillText(
+                    "Game Over! Press [esc] to quit",
+                    canvas.width / 2,
+                    200
+                    );
             }
         };
 
+        // window.addEventListener("keydown", (event) => {
+        //     if (event.key === "Enter") {
+        //         const copy = {...saveGame};
+        //         copy.score = score;
+        //         copy.lives = lives;
+        //         copy.level = level;
+        //         updateSaveGame(copy)
+        //         }
+        //     }
+        // window.addEventListener("keydown", (event) => {
+        //     const copy = { ...saveGame };
+        //     copy.score = score;
+        //     copy.lives = lives;
+        //     copy.level = level;
+        //     updateSaveGame(copy, saveId);
+        //     if (event.key === " ") {
+        //         getSingleSave(saveId).then(setSaveGame)
+        //     } else if (event.key === "Escape") {
+        //         getSingleSave(saveId).then(setSaveGame).then(() => {navigate('/games')})
+        //     }
+        // })
+
+        // const handleGameOver = () => {
+        //     if (roundOver && lives > 0) {
+        //         lives -= 1;
+        //         const copy = { ...saveGame };
+        //         copy.score = score;
+        //         copy.lives = lives;
+        //         copy.level = level;
+        //         updateSaveGame(copy, saveId)
+        //         getSingleSave(saveId).then(setSaveGame);
+        //         console.log("saveGame", saveGame);
+        //     } else if (roundOver && lives == 0) {
+        //         const copy = { ...saveGame };
+        //         copy.score = score;
+        //         copy.lives = lives;
+        //         copy.level = level;
+        //         copy.game_over = true
+        //         updateSaveGame(copy, saveId);
+        //         getSingleSave(saveId).then(setSaveGame).then(navigate('/'));
+        //         console.log("saveGame", saveGame);
+        //     }
+        // }
+        
         const input = new InputHandler();
         const player = new Character(canvas.width, canvas.height);
         const background = new Background(canvas.width, canvas.height);
-
+        
         let lastTime = 0;
         let enemyTimer = 0;
         let enemyInterval = 1000;
@@ -344,30 +418,31 @@ export const SideScroll = () => {
         //     level++;
         //     enemyInterval -= 100;
         // }
-        let scoreUpdated = false
+        let scoreUpdated = false;
 
         const animate = (timestamp) => {
             const deltaTime = timestamp - lastTime;
             lastTime = timestamp;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             background.draw(ctx);
-            background.update()
+            background.update();
             player.draw(ctx);
             player.update(input, deltaTime, enemies);
             handleEnemies(deltaTime);
             if (score === 0 && level === 1) {
-               displayLevel(ctx)
+                displayLevel(ctx);
             } else if (score % 5 === 0 && score > 0) {
                 if (!scoreUpdated) {
                     level++;
                     enemyInterval -= 100;
                     scoreUpdated = true;
                 }
-                displayLevel(ctx)
+                displayLevel(ctx);
             } else {
-                scoreUpdated = false
+                scoreUpdated = false;
             }
             displayStatusText(ctx);
+            // handleGameOver()
             if (!roundOver) requestAnimationFrame(animate);
             else if (roundOver && lives > 0) {
                 lives -= 1;
@@ -377,32 +452,37 @@ export const SideScroll = () => {
                 copy.level = level;
                 updateSaveGame(copy, saveId);
                 setTimeout(() => {
-                    roundOver = false;
+                    getSingleSave(saveId).then(setSaveGame);
                 }, 2000);
-            } else {
+                console.log("saveGame", saveGame);
+            } else if (roundOver && lives === 0) {
                 const copy = { ...saveGame };
                 copy.score = score;
                 copy.level = level;
                 copy.game_over = true;
-                updateSaveGame(copy, saveId)
-                    setTimeout(() => {
-                        navigate("/");
-                    }, 2000)
+                updateSaveGame(copy, saveId);
+                setTimeout(() => {
+                    getSingleSave(saveId).then(setSaveGame).then(navigate('/'));
+                }, 2000);
+                console.log("saveGame", saveGame);
             }
         };
         animate(0);
-    }
-    }, [characterAsset, backgroundAsset, enemyAsset]);
+
+
+
+        
+    };
 
     return (
-            <Canvas ref={canvas1}></Canvas>
+        <Canvas ref={canvas1}></Canvas>
         // <Main>
         // </Main>
     );
 };
 
 const Main = styled.div`
-box-sizing: border-box;
+    box-sizing: border-box;
     background: black;
     width: 100%;
     height: 100%;

@@ -50,3 +50,16 @@ export const deleteSave = (saveId) => {
         }
     })
 }
+
+export const createAwardedTrophy = (save, id) => {
+    return fetch("http://localhost:8000/saves/" + id + "/award_trophy", {
+        method: 'POST',
+        headers:{
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Token ${localStorage.getItem("u_token")}`
+        },
+        body: JSON.stringify(save)
+    })
+        .then(response => response.json())
+}
