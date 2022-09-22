@@ -3,17 +3,25 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import background from './background2.jpg'
 
+
+
+
+
+
+
 export const Welcome = () => {
+    const [audio] = useState(new Audio("https://www.chosic.com/wp-content/uploads/2020/07/the-epic-2-by-rafael-krux.mp3"));
+
     const canvas1 = useRef()
     const navigate = useNavigate()
     
-    
+
     useEffect(()=>{
         const canvas = canvas1.current
         const ctx = canvas.getContext('2d')
         const width = canvas.width = window.innerWidth
         const height = canvas.height = window.innerHeight
-
+        
         class Background {
             constructor(width, height) {
                 this.image = new Image()
@@ -38,23 +46,23 @@ export const Welcome = () => {
                 }
             }
         }
-
+        
         const backgroundImage = new Background(width, height)
-
+        
         const animate = () => {
             ctx.clearRect(0, 0, width, height)
             backgroundImage.draw(ctx)
             backgroundImage.update()
             requestAnimationFrame(animate)
+            audio.play()
         }
         animate()
     },[])
-
+    
     return (
         <>
             <Canvas ref={canvas1}></Canvas>
         <Main>
-            
             <Title>Your Game Here</Title>
             <Div>
             <Button onClick={()=> navigate("/register")}>New Player</Button>
@@ -89,7 +97,7 @@ z-index: 2;
 `
 
 const Div = styled.div`
-z-index: 2;
+z-index: 3;
 `
 const Button = styled.button`
 z-index: 2;

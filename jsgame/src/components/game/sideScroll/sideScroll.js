@@ -379,7 +379,7 @@ export const SideScroll = () => {
                 context.textAlign = "center";
                 context.fillStyle = "black";
                 context.fillText(
-                    "You Died! Press [enter] to try again. Press [esc] to quit",
+                    "You Died! Try Again!",
                     canvas.width / 2,
                     200
                     );
@@ -387,7 +387,7 @@ export const SideScroll = () => {
                 context.textAlign = "center";
                 context.fillStyle = "black";
                 context.fillText(
-                    "Game Over! Press [esc] to quit",
+                    "Game Over!",
                     canvas.width / 2,
                     200
                     );
@@ -446,7 +446,7 @@ export const SideScroll = () => {
         let enemyTimer = 0;
         let enemyInterval = 1000;
         let randomEnemyInterval = Math.random() * 3000 + 1000;
-        
+        let pause = false
         // if (score % 20 === 0 && score > 0) {
         //     level++;
         //     enemyInterval -= 100;
@@ -467,6 +467,7 @@ export const SideScroll = () => {
             } else if (score % 5 === 0 && score > 0) {
                 if (!scoreUpdated) {
                     level++;
+                    background.speed += 1
                     enemyInterval -= 100;
                     scoreUpdated = true;
                 }
