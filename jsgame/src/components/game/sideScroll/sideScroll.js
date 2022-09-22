@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
 import {
+    createAwardedTrophy,
     getSaves,
     getSingleSave,
     updateSaveGame,
@@ -75,8 +76,7 @@ export const SideScroll = () => {
         let lives = saveGame.lives;
         let roundOver = false;
         let level = saveGame.level;
-        let gameOver = saveGame.game_over;
-        let endedByUser = false;
+        let trophiesWon = saveGame.awarded_trophies;
         /* handles keypress events */
         class InputHandler {
             constructor() {
@@ -84,7 +84,6 @@ export const SideScroll = () => {
                 window.addEventListener("keydown", (e) => {
                     if (inputs.includes(e.key) && !this.keys.includes(e.key)) {
                         this.keys.push(e.key);
-                        console.log(this.keys);
                     }
                 });
                 window.addEventListener("keyup", (e) => {
@@ -322,6 +321,19 @@ export const SideScroll = () => {
         };
 
         const handleTrophies = () => {
+            trophies.forEach(object => {
+                const wonTrophy = trophiesWon.find(trophy => trophy.id === object.id) 
+                if (!wonTrophy && object.id === 1 && score === 5 && lives === 3) {
+                    trophiesWon.push(object)
+                    console.log(trophiesWon);
+                } else if (!wonTrophy && object.id === 2 && score === 10 && lives === 3) {
+                    trophiesWon.push(object)
+                    console.log(trophiesWon);
+                } else if (!wonTrophy && object.id === 3 && score === 15 && lives === 3) {
+                    trophiesWon.push(object)
+                    console.log(trophiesWon);
+                }
+            })
         };
 
         const displayLevel = (context) => {
@@ -442,6 +454,7 @@ export const SideScroll = () => {
                 scoreUpdated = false;
             }
             displayStatusText(ctx);
+            handleTrophies();
             // handleGameOver()
             if (!roundOver) requestAnimationFrame(animate);
             else if (roundOver && lives > 0) {
@@ -450,6 +463,12 @@ export const SideScroll = () => {
                 copy.score = score;
                 copy.lives = lives;
                 copy.level = level;
+                trophiesWon.forEach(trophy => {
+                    console.log(trophy.id);
+                    
+                        createAwardedTrophy({ trophy_id: trophy.id, save_id: saveId }, saveId)
+                    
+                })
                 updateSaveGame(copy, saveId);
                 setTimeout(() => {
                     getSingleSave(saveId).then(setSaveGame);
@@ -460,6 +479,10 @@ export const SideScroll = () => {
                 copy.score = score;
                 copy.level = level;
                 copy.game_over = true;
+                trophiesWon.forEach(trophy => {
+                    console.log(trophy.id);
+                        createAwardedTrophy({ trophy_id: trophy.id, save_id: saveId }, saveId)
+                })
                 updateSaveGame(copy, saveId);
                 setTimeout(() => {
                     getSingleSave(saveId).then(setSaveGame).then(navigate('/'));

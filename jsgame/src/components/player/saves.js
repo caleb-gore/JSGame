@@ -34,6 +34,7 @@ export const Saves = () => {
     useEffect(() => {
         getSaves().then(setSaveGames);
         getSaves().then(setSaveGames);
+        localStorage.removeItem("saveGame")
     }, []);
 
     //CREATE SAVE SLOT UI
@@ -42,32 +43,11 @@ export const Saves = () => {
         CREATE RESUME GAME SAVE SLOT
         ELSE CREATE NEW GAME SAVE SLOT
         NAVIGATE TO GAME */
-        if (saveGames[i] && saveGames[i].game_over === false) {
-            return (
+        let saveSlots = []
+        if (saveGames[i]) {
+            saveSlots.push(
                 <SaveSlot key={"saveGame--" + i}>
-                    <Button
-                        onClick={() => {
-                            localStorage.setItem("saveGame", saveGames[i].id);
-                            navigate("/game");
-                        }}
-                    >
-                        Play
-                    </Button>
-                    <div>
-                        <p key={"slot--" + i}>Slot {i + 1}</p>
-                        <p key={"score--" + i}>Score: {saveGames[i].score}</p>
-                        <p key={"level--" + 1}>Level: {saveGames[i].level}</p>
-                        <p key={"lives--" + i}>Lives: {saveGames[i].lives}</p>
-                        <p key={"trophies--" + 1}>
-                            Trophies: {saveGames[i].awarded_trophies}
-                        </p>
-                    </div>
-                </SaveSlot>
-            );
-        } else if (saveGames[i] && saveGames[i].game_over === true) {
-            return (
-                <SaveSlot key={"saveGame--" + i}>
-                    <Button
+                    {saveGames[i].game_over ? <Button
                         onClick={() => {
                             // SET OBJECT FOR DELETION
                             setFileToBeDeleted(saveGames[i]);
@@ -76,20 +56,45 @@ export const Saves = () => {
                         }}
                     >
                         Start Over
-                    </Button>
+                    </Button>: <Button
+                        onClick={() => {
+                            localStorage.setItem("saveGame", saveGames[i].id);
+                            navigate("/game");
+                        }}
+                    >
+                        Play
+                    </Button> }
+                    
                     <div>
-                        <p key={"slot--" + i}>Slot {i + 1}</p>
-                        <p key={"score--" + i}>Score: {saveGames[i].score}</p>
-                        <p key={"level--" + 1}>Level: {saveGames[i].level}</p>
-                        <p key={"lives--" + 1}>Lives: {saveGames[i].lives}</p>
-                        <p key={"trophies--" + 1}>
-                            Trophies: {saveGames[i].awarded_trophies}
+                        <p >Slot {i + 1}</p>
+                        <p >Score: {saveGames[i].score}</p>
+                        <p >Level: {saveGames[i].level}</p>
+                        <p >Lives: {saveGames[i].lives}</p>
+                        <p >
+                            Trophies: {saveGames[i].awarded_trophies.map((t) => {
+                                return t.type
+                            })}
                         </p>
                     </div>
                 </SaveSlot>
             );
+        // } else if (saveGames[i]?.game_over === true) {
+        //     saveSlots.push(
+        //         <SaveSlot key={"saveGame--" + i}>
+                    
+        //             <div>
+        //                 <p >Slot {i + 1}</p>
+        //                 <p >Score: {saveGames[i].score}</p>
+        //                 <p >Level: {saveGames[i].level}</p>
+        //                 <p >Lives: {saveGames[i].lives}</p>
+        //                 <p >
+        //                     Trophies: {saveGames[i].awarded_trophies}
+        //                 </p>
+        //             </div>
+        //         </SaveSlot>
+        //     );
         } else {
-            return (
+            saveSlots.push(
                 <SaveSlot key={"saveGame--" + i}>
                     <Button
                         onClick={() => {
@@ -104,12 +109,13 @@ export const Saves = () => {
                         NEW
                     </Button>
                     <div>
-                        <p key={"slot--" + i}>Slot {i + 1}</p>
-                        <p key={"new--" + i}>NEW</p>
+                        <p >Slot {i + 1}</p>
+                        <p >NEW</p>
                     </div>
                 </SaveSlot>
             );
         }
+        return saveSlots
     };
 
     // CREATE 4 SAVE SLOTS
@@ -173,6 +179,7 @@ export const Saves = () => {
                         confirmDeleteDialog.current.close();
                         deleteDialog.current.close();
                         // DELETE GAME, GET GAMES, CLEAR FILE TO BE DELETED
+                        localStorage.removeItem("saveGame") 
                         deleteSave(fileToBeDeleted.id)
                             .then(() => getSaves().then(setSaveGames))
                             .then(() => setFileToBeDeleted({}));

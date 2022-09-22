@@ -15,6 +15,10 @@ export const Login = () => {
     const password = useRef()
     const invalidDialog = useRef()
     const navigate = useNavigate()
+    const [user, setUser] = useState({
+        username: "brandnewplayer",
+        password: "brandnewplayer"
+    })
 
 
     useEffect(()=>{
@@ -94,12 +98,24 @@ export const Login = () => {
                 <Form className="form--login" onSubmit={handleLogin}>
                     <H2>Please sign in</H2>
                     <span>
-                        <Input ref={username} type="username" id="username" className="form-control" placeholder="Username" required autoFocus />
+                        <Input ref={username} onChange={
+                            ()=>{
+                                const copy = {...user}
+                                copy.username = username.current.value
+                                setUser(copy)
+                            }
+                        } value={user.username} type="username" id="username" className="form-control" placeholder="Username" required autoFocus />
 
                     </span>
                     <span>
 
-                        <Input ref={password} type="password" id="password" className="form-control" placeholder="Password" required />
+                        <Input ref={password} onChange={
+                            ()=>{
+                                const copy = {...user}
+                                copy.password = password.current.value
+                                setUser(copy)
+                            }
+                        } value={user.password} type="password" id="password" className="form-control" placeholder="Password" required />
                     </span>
                         <Button className="btn btn-1 btn-sep icon-send" type="submit">Sign In</Button>
                 </Form>
