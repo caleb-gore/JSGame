@@ -39,7 +39,6 @@ export const updateSaveGame = (save, id) => {
         },
         body: JSON.stringify(save)
     })
-        .then(response => response.json())
 }
 
 export const deleteSave = (saveId) => {

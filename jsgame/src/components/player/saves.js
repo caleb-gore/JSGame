@@ -64,15 +64,14 @@ export const Saves = () => {
                     >
                         Play
                     </Button> }
-                    
-                    <div>
                         <p >Slot {i + 1}</p>
+                    <div>
                         <p >Score: {saveGames[i].score}</p>
                         <p >Level: {saveGames[i].level}</p>
                         <p >Lives: {saveGames[i].lives}</p>
                         <p >
                             Trophies: {saveGames[i].awarded_trophies.map((t) => {
-                                return t.type
+                                return <p>{t.type}</p>
                             })}
                         </p>
                     </div>
@@ -239,13 +238,14 @@ const Title = styled.h1`
 const SaveSlot = styled.section`
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     background-color: grey;
     border-radius: 10px;
-    width: 200px;
-    height: 200px;
-    margin: 30px 100px;
+    width: 300px;
+    height: 500px;
+    margin: 30px 70px;
+    padding: 30px;
 `;
 const SaveContainer = styled.div`
     display: flex;
