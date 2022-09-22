@@ -16,7 +16,7 @@ export const Register = () => {
     const verifyPassword = useRef();
     const passwordDialog = useRef();
     const navigate = useNavigate();
-    const [is_staff, setIsStaff] = useState("")
+    // const [is_staff, setIsStaff] = useState("")
     
     
     useEffect(()=>{
@@ -72,7 +72,7 @@ export const Register = () => {
             const newUser = {
                 username: username.current.value,
                 password: password.current.value,
-                is_staff: is_staff
+                is_staff: false
             };
 
             registerUser(newUser).then((res) => {
