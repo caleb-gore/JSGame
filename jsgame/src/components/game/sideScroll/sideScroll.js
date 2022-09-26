@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
 import {
     createAwardedTrophy,
-    getSaves,
     getSingleSave,
     updateSaveGame,
 } from "../../../managers/SaveManager";
@@ -43,7 +42,7 @@ export const SideScroll = () => {
 
     useEffect(() => {
         if (saveGame.id > 0) {
-            assets.map((asset) => {
+            assets.forEach((asset) => {
                 if (asset.name === "red-dragon") {
                     setCharacter(asset);
                 } else if (asset.name === "pink") {
@@ -64,7 +63,7 @@ export const SideScroll = () => {
         ) {
             runGame();
         }
-    }, [characterAsset, backgroundAsset, enemyAsset, saveGame]);
+    }, [characterAsset, backgroundAsset, enemyAsset, saveGame,]);
 
     const runGame = () => {
         const canvas = canvas1.current;
@@ -383,7 +382,7 @@ export const SideScroll = () => {
                     canvas.width / 2,
                     200
                     );
-                } else if (roundOver && lives == 0) {
+                } else if (roundOver && lives === 0) {
                 context.textAlign = "center";
                 context.fillStyle = "black";
                 context.fillText(
@@ -446,7 +445,6 @@ export const SideScroll = () => {
         let enemyTimer = 0;
         let enemyInterval = 1000;
         let randomEnemyInterval = Math.random() * 3000 + 1000;
-        let pause = false
         // if (score % 20 === 0 && score > 0) {
         //     level++;
         //     enemyInterval -= 100;
@@ -526,13 +524,7 @@ export const SideScroll = () => {
     );
 };
 
-const Main = styled.div`
-    box-sizing: border-box;
-    background: black;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-`;
+
 const Canvas = styled.canvas`
     border: 1px solid white;
     position: absolute;
@@ -542,17 +534,3 @@ const Canvas = styled.canvas`
     overflow: hidden;
 `;
 
-const Img = styled.img`
-    display: none;
-`;
-const TryAgain = styled.button`
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 40px;
-    font-family: Helvetica;
-`;

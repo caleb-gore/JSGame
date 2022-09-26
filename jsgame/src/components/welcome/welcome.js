@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import background from './background2.jpg'
@@ -10,7 +10,7 @@ import background from './background2.jpg'
 
 
 export const Welcome = () => {
-    const [audio] = useState(new Audio("https://www.chosic.com/wp-content/uploads/2020/07/the-epic-2-by-rafael-krux.mp3"));
+    // const [audio] = useState(new Audio("https://www.chosic.com/wp-content/uploads/2020/07/the-epic-2-by-rafael-krux.mp3"));
 
     const canvas1 = useRef()
     const navigate = useNavigate()
@@ -54,7 +54,7 @@ export const Welcome = () => {
             backgroundImage.draw(ctx)
             backgroundImage.update()
             requestAnimationFrame(animate)
-            audio.play()
+            // audio.play()
         }
         animate()
     },[])
