@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { deleteAsset, getAssets, saveAsset } from "../../managers/AssetManager";
 import { Collapsible } from "../collapsible";
 
 export const Assets = () => {
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
     const [newAsset, updateNewAsset] = useState({
         name: "",
         width: "",
@@ -52,33 +52,62 @@ export const Assets = () => {
             if (!categoryAssets[0]) {
                 return (
                     <Collapsible label={cat} key={cat}>
-                        <h4>{cat}</h4>
-                        <p>No Assets Uploaded</p>
+                        <p>No assets in this category</p>
                     </Collapsible>
                 );
             } else {
                 return (
                     <Collapsible label={cat} key={cat}>
-                        <h4 key={cat}>{cat}</h4>
-                        <ul>
-                            {categoryAssets.map((asset) => {
-                                return (
-                                    <li key={`asset--${asset.id}`}>
-                                        <button
-                                            onClick={()=>{
-                                                deleteAsset(asset.id)
-                                                .then(()=>getAssets()
-                                                .then(setAssets))
-                                            }}>delete</button>
-                                        {asset.name}{" "}
-                                        <img
-                                            src={`http://localhost:8000${asset.file}`}
-                                            height="100"
-                                        />
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                        <Table>
+                            <thead>
+                                <TheadTr>
+                                    <Th>Name</Th>
+                                    <Th>Width</Th>
+                                    <Th>Height</Th>
+                                    <Th>File</Th>
+                                    <Th>Type</Th>
+                                    <Th>Actions</Th>
+                                </TheadTr>
+                            </thead>
+                            <tbody>
+                                {categoryAssets.map((asset) => {
+                                    return (
+                                        <TbodyTr key={asset.id}>
+                                            <Td>{asset.name}</Td>
+                                            <Td>{asset.width}</Td>
+                                            <Td>{asset.height}</Td>
+                                            <Td>
+                                                <img
+
+                                                    src={`http://localhost:8000${asset.file}`}
+                                                    height="100px"
+                                                maxWidth="500px"
+                                                alt={asset.name}/>
+                                            </Td>
+                                            <Td>{asset.type}</Td>
+                                            <Td>
+                                                <button
+
+                                                    onClick={() => {
+                                                        deleteAsset(asset.id).then(
+                                                            () => {
+                                                                getAssets().then(
+                                                                    setAssets
+                                                                );
+                                                            }
+                                                        );
+                                                    }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </Td>
+                                        </TbodyTr>
+                                    );
+                                })}
+                            </tbody>
+
+                        </Table>
+                        
                     </Collapsible>
                 );
             }
@@ -184,3 +213,31 @@ export const Assets = () => {
 const Main = styled.main`
 margin-top: 100px;
 `
+const Table = styled.table`
+border-spacing: 1; 
+  border-collapse: collapse; 
+  background:white;
+  border-radius:6px;
+  overflow:hidden;
+  max-width:800px; 
+  width:100%;
+  margin:0 auto;
+  position:relative;
+`
+
+const Td = styled.td`padding-left:8px;
+text-align:left;
+		&.l 					{ text-align:right }
+		&.c 					{ text-align:center }
+		&.r 					{ text-align:center }`
+const Th = styled.th`padding-left:8px;
+text-align:left;
+		&.l 					{ text-align:right }
+		&.c 					{ text-align:center }
+		&.r 					{ text-align:center }`
+const TheadTr = styled.tr`height:60px;
+background:#FFED86;
+font-size:16px;`
+const TbodyTr = styled.tr`height:48px; border-bottom:1px solid #E3F1D5 ;
+&:last-child  { border:0; }`
+

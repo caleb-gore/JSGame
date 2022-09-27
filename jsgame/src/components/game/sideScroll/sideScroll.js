@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
 import {
     createAwardedTrophy,
-    getSaves,
     getSingleSave,
     updateSaveGame,
 } from "../../../managers/SaveManager";
@@ -43,12 +42,12 @@ export const SideScroll = () => {
 
     useEffect(() => {
         if (saveGame.id > 0) {
-            assets.map((asset) => {
-                if (asset.name === "dog") {
+            assets.forEach((asset) => {
+                if (asset.name === "red-dragon") {
                     setCharacter(asset);
-                } else if (asset.name === "autumn") {
+                } else if (asset.name === "pink") {
                     setBackground(asset);
-                } else if (asset.name === "ghost") {
+                } else if (asset.name === "enemy-dragon") {
                     setEnemy(asset);
                 }
             });
@@ -64,7 +63,7 @@ export const SideScroll = () => {
         ) {
             runGame();
         }
-    }, [characterAsset, backgroundAsset, enemyAsset, saveGame]);
+    }, [characterAsset, backgroundAsset, enemyAsset, saveGame,]);
 
     const runGame = () => {
         const canvas = canvas1.current;
@@ -102,22 +101,24 @@ export const SideScroll = () => {
                 this.width = characterAsset.width;
                 this.height = characterAsset.height;
                 this.x = 0;
-                this.y = this.gameHeight - this.height;
+                this.y = this.gameHeight/2 - this.height/2;
                 this.image = new Image();
                 this.image.src = "http://localhost:8000" + characterAsset.file;
                 this.frameX = 0;
-                this.maxFrame = 8;
+                this.maxFrame = 11;
                 this.fps = 20;
                 this.frameY = 0;
                 this.frameTimer = 0;
                 this.frameInterval = 1000 / this.fps;
-                this.speed = 0;
+                this.speedX = 0;
+                this.speedY = 0;
                 this.vy = 0;
                 this.weight = 1;
             }
             draw(context) {
-                context.strokeStyle = "white";
-                context.strokeRect(this.x, this.y, this.width, this.height);
+                // context.strokeStyle = "white";
+                // context.strokeRect(this.x, this.y, this.width, this.height);
+                context.fillStyle = 'transparent'
                 context.beginPath();
                 context.arc(
                     this.x + this.width / 2,
@@ -127,7 +128,6 @@ export const SideScroll = () => {
                     Math.PI * 2
                 );
                 context.stroke();
-                // context.fillStyle = 'white'
                 // context.fillRect(this.x, this.y, this.width, this.height)
                 context.drawImage(
                     this.image,
@@ -147,7 +147,7 @@ export const SideScroll = () => {
                     const dx = enemy.x - this.x;
                     const dy = enemy.y - this.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < this.width / 2 + enemy.width / 2) {
+                    if (distance < this.width / 2 + enemy.width / 2 - 150) {
                         roundOver = true;
                     }
                 });
@@ -163,42 +163,50 @@ export const SideScroll = () => {
 
                 // controls
                 if (input.keys.includes("ArrowRight")) {
-                    this.speed = 5;
+                    this.speedX = 8.5;
                 } else if (input.keys.includes("ArrowLeft")) {
-                    this.speed = -5;
-                } else if (input.keys.includes("ArrowUp") && this.onGround()) {
-                    this.vy -= 32;
-                } else {
-                    this.speed = 0;
+                    this.speedX = -8.5;
+                } else if (input.keys.includes("ArrowUp")) {
+                    this.speedY = -8.5;
+                } else if (input.keys.includes("ArrowDown")) {
+                    this.speedY = 8.5;
+                } else if (!input.keys.includes("ArrowRight") || !input.keys.includes("ArrowLeft") || !input.keys.includes("ArrowUp") || !input.keys.includes("ArrowDown")) {
+                this.speedX = 0
+                this.speedY = 0 
                 }
-
                 // horizontal movement
                 if (this.x < 0) {
                     this.x = 0;
                 } else if (this.x > this.gameWidth - this.width) {
                     this.x = this.gameWidth - this.width;
                 }
-                this.x += this.speed;
-
+                this.x += this.speedX;
+                
                 // vertical movement
-                this.y += this.vy;
-                if (!this.onGround()) {
-                    this.vy += this.weight;
-                    this.maxFrame = 5;
-                    this.frameY = 1; // jump
-                } else {
-                    this.vy = 0;
-                    this.maxFrame = 8;
-                    this.frameY = 0; // idle
+                if (this.y < 0) {
+                    this.y = 0;
+                } else if (this.y > this.gameHeight - this.height * 1.85) {
+                    this.y = this.gameHeight - this.height * 1.85;
                 }
+                this.y += this.speedY;
+                // this.y += this.vy;
+                // if (!this.onGround()) {
+                //     this.vy += this.weight;
+                //     this.maxFrame = 5;
+                //     this.frameY = 1; // jump
+                // } else {
+                //     this.vy = 0;
+                //     this.maxFrame = 8;
+                //     this.frameY = 0; // idle
+                // }
                 // vertical boundary
-                if (this.y > this.gameHeight - this.height) {
-                    this.y = this.gameHeight - this.height;
-                }
+                // if (this.y > this.gameHeight - this.height) {
+                //     this.y = this.gameHeight - this.height;
+                // }
             }
-            onGround() {
-                return this.y >= this.gameHeight - this.height;
-            }
+            // onGround() {
+            //     return this.y >= this.gameHeight - this.height * 1.85;
+            // }
         }
 
         class Background {
@@ -213,7 +221,7 @@ export const SideScroll = () => {
                     backgroundAsset.width *
                     (this.gameHeight / backgroundAsset.height);
                 this.height = this.gameHeight;
-                this.speed = 10;
+                this.speed = level+2;
             }
             draw(context) {
                 context.drawImage(
@@ -255,7 +263,9 @@ export const SideScroll = () => {
                 this.image = new Image();
                 this.image.src = "http://localhost:8000" + enemyAsset.file;
                 this.x = this.gameWidth;
-                this.y = this.gameHeight - this.height;
+                this.y = Math.random(this.gameHeight - this.height * 2.5)
+                this.directionX = Math.random() * 3 + 2
+                this.directionY = Math.random() * 3 + 2.5;
                 this.frameX = 0;
                 this.maxFrame = 10;
                 this.fps = 20;
@@ -265,8 +275,8 @@ export const SideScroll = () => {
                 this.markedForDeletion = false;
             }
             draw(context) {
-                context.strokeStyle = "white";
-                context.strokeRect(this.x, this.y, this.width, this.height);
+                context.strokeStyle = "transparent";
+                // context.strokeRect(this.x, this.y, this.width, this.height);
                 context.beginPath();
                 context.arc(
                     this.x + this.width / 2,
@@ -289,6 +299,16 @@ export const SideScroll = () => {
                 );
             }
             update(deltaTime) {
+                if (this.y < 0 || this.y > this.gameHeight - this.height * 2) {
+                    this.directionY = this.directionY * -1
+                }
+                this.x -= this.directionX
+                this.y += this.directionY
+                if (this.x < -this.width) {
+                    this.markedForDeletion = true
+                    score++;
+                }
+
                 if (this.frameTimer > this.frameInterval) {
                     if (this.frameX >= this.maxFrame) this.frameX = 0;
                     else this.frameX++;
@@ -297,11 +317,11 @@ export const SideScroll = () => {
                     this.frameTimer += deltaTime;
                 }
 
-                this.x -= this.speed;
-                if (this.x < -this.width) {
-                    this.markedForDeletion = true;
-                    score++;
-                }
+                // this.x -= this.speed;
+                // if (this.x < -this.width) {
+                //     this.markedForDeletion = true;
+                //     score++;
+                // }
             }
         }
 
@@ -358,15 +378,15 @@ export const SideScroll = () => {
                 context.textAlign = "center";
                 context.fillStyle = "black";
                 context.fillText(
-                    "You Died! Press [enter] to try again. Press [esc] to quit",
+                    "You Died! Try Again!",
                     canvas.width / 2,
                     200
                     );
-                } else if (roundOver && lives == 0) {
+                } else if (roundOver && lives === 0) {
                 context.textAlign = "center";
                 context.fillStyle = "black";
                 context.fillText(
-                    "Game Over! Press [esc] to quit",
+                    "Game Over!",
                     canvas.width / 2,
                     200
                     );
@@ -425,7 +445,6 @@ export const SideScroll = () => {
         let enemyTimer = 0;
         let enemyInterval = 1000;
         let randomEnemyInterval = Math.random() * 3000 + 1000;
-        
         // if (score % 20 === 0 && score > 0) {
         //     level++;
         //     enemyInterval -= 100;
@@ -446,6 +465,7 @@ export const SideScroll = () => {
             } else if (score % 5 === 0 && score > 0) {
                 if (!scoreUpdated) {
                     level++;
+                    background.speed += 1
                     enemyInterval -= 100;
                     scoreUpdated = true;
                 }
@@ -504,13 +524,7 @@ export const SideScroll = () => {
     );
 };
 
-const Main = styled.div`
-    box-sizing: border-box;
-    background: black;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-`;
+
 const Canvas = styled.canvas`
     border: 1px solid white;
     position: absolute;
@@ -520,17 +534,3 @@ const Canvas = styled.canvas`
     overflow: hidden;
 `;
 
-const Img = styled.img`
-    display: none;
-`;
-const TryAgain = styled.button`
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 40px;
-    font-family: Helvetica;
-`;

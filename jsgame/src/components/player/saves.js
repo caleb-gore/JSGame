@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { getAssets } from "../../managers/AssetManager";
 import {
     createSave,
     deleteSave,
@@ -20,6 +21,7 @@ export const Saves = () => {
     const [saveGames, setSaveGames] = useState([]);
     //HOLD SELECTED OBJECT TO BE DELETED
     const [fileToBeDeleted, setFileToBeDeleted] = useState({});
+    const [assets, setAssets] = useState([]);
     // const userId = JSON.parse(localStorage.getItem("u_id"));
 
     //NEW GAME OBJECT
@@ -34,6 +36,7 @@ export const Saves = () => {
     useEffect(() => {
         getSaves().then(setSaveGames);
         getSaves().then(setSaveGames);
+        getAssets().then(setAssets);
         localStorage.removeItem("saveGame")
     }, []);
 
@@ -64,17 +67,21 @@ export const Saves = () => {
                     >
                         Play
                     </Button> }
-                    
-                    <div>
                         <p >Slot {i + 1}</p>
+                    <div>
                         <p >Score: {saveGames[i].score}</p>
                         <p >Level: {saveGames[i].level}</p>
                         <p >Lives: {saveGames[i].lives}</p>
                         <p >
-                            Trophies: {saveGames[i].awarded_trophies.map((t) => {
-                                return t.type
-                            })}
-                        </p>
+                            Trophies:
+                            </p>
+                             {saveGames[i].awarded_trophies.length > 0 ? saveGames[i].awarded_trophies.map((t) => {
+                                if (t) {
+                                    const trophyImage = assets.find(asset => asset.id === t.asset)
+                                    
+                                    return <img src={"http://localhost:8000" + trophyImage.file} height={100} alt={trophyImage.name}/>
+                                }
+                            }) : <p>No trophies yet</p>}
                     </div>
                 </SaveSlot>
             );
@@ -239,13 +246,14 @@ const Title = styled.h1`
 const SaveSlot = styled.section`
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     background-color: grey;
     border-radius: 10px;
-    width: 200px;
-    height: 200px;
-    margin: 30px 100px;
+    width: 300px;
+    height: 500px;
+    margin: 30px 70px;
+    padding: 30px;
 `;
 const SaveContainer = styled.div`
     display: flex;
@@ -280,7 +288,7 @@ const Button = styled.button`
 const Main = styled.main`
     display: flex;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgb(144, 200, 144);
     height: 100vh;
     padding: 20px;
     z-index: 2;
