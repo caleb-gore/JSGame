@@ -15,8 +15,11 @@ export const Welcome = () => {
     const canvas1 = useRef()
     const navigate = useNavigate()
     
+    
 
     useEffect(()=>{
+
+
         const canvas = canvas1.current
         const ctx = canvas.getContext('2d')
         const width = canvas.width = window.innerWidth

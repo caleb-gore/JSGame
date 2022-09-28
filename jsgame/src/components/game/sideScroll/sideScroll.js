@@ -42,13 +42,16 @@ export const SideScroll = () => {
 
     useEffect(() => {
         if (saveGame.id > 0) {
-            assets.forEach((asset) => {
-                if (asset.name === "red-dragon") {
+            assets?.forEach((asset) => {
+                if (asset?.name === "red-dragon") {
                     setCharacter(asset);
-                } else if (asset.name === "pink") {
-                    setBackground(asset);
-                } else if (asset.name === "enemy-dragon") {
+                    console.log(asset);
+                } else if (asset?.name === "pink") {
+                    setBackground(asset)
+                    console.log(asset);;
+                } else if (asset?.name === "enemy-dragon") {
                     setEnemy(asset);
+                    console.log(asset);
                 }
             });
         }

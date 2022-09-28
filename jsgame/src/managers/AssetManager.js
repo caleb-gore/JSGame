@@ -37,3 +37,15 @@ export const deleteAsset = (assetId) => {
         }
     })
 }
+
+export const updateAsset = (asset, id) => {
+    return fetch(`http://localhost:8000/assets/${id}`, {
+        method: 'PUT',
+        headers:{
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Token ${localStorage.getItem("u_token")}`
+        },
+        body: JSON.stringify(asset)
+    })
+}

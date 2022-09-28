@@ -79,7 +79,7 @@ export const Saves = () => {
                                 if (t) {
                                     const trophyImage = assets.find(asset => asset.id === t.asset)
                                     
-                                    return <img src={"http://localhost:8000" + trophyImage.file} height={100} alt={trophyImage.name}/>
+                                    return <img src={"http://localhost:8000" + trophyImage?.file} height={100} alt={trophyImage?.name}/>
                                 }
                             }) : <p>No trophies yet</p>}
                     </div>
@@ -234,6 +234,7 @@ const Div = styled.div`
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    margin-top: 40px;
 `;
 
 const Title = styled.h1`
@@ -254,6 +255,9 @@ const SaveSlot = styled.section`
     height: 500px;
     margin: 30px 70px;
     padding: 30px;
+    border:8px outset #999;
+    -webkit-box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+    -moz-box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
 `;
 const SaveContainer = styled.div`
     display: flex;
