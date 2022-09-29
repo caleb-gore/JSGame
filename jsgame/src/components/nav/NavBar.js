@@ -1,30 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getGames } from "../../managers/GameManager";
 import { getUser } from "../../managers/UserManager";
 import "./NavBar.css";
 
 export const NavBar = () => {
     const [user, setUser] = useState({});
     const [games, setGames] = useState([]);
-    const [game, setGame] = useState({});
     const userId = JSON.parse(localStorage.getItem("u_id"));
     useEffect(() => {
         getUser(userId).then(setUser);
-        getGames().then(setGames);
     }, []);
 
-    useEffect(() => {
-        setGame(games[0]);
-    }, [games]);
+    
     const navigate = useNavigate();
     console.log(user);
     return (
         <Main>
             <nav className="navMenu">
                 <Link to="/welcome">
-                    <Title>{game?.name}</Title>
+                    <Title>Your Game Here</Title>
                 </Link>
                 <Link to="/assets">Assets</Link>
                 <Link to="/games">Games</Link>

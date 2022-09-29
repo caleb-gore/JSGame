@@ -4,12 +4,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useHistory, useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { getAssets } from "../../managers/AssetManager"
 import { loginUser } from "../../managers/AuthManager"
-import background from '../welcome/background2.jpg'
+import { getGames } from "../../managers/GameManager"
 
 
 // COMPONENT
 export const Login = () => {
+    const [game, setGame] = useState({})
+    const [assets, setAssets] = useState([])
+    const [background, setBackground] = useState({})
     const canvas1 = useRef()
     const username = useRef()
     const password = useRef()
@@ -20,6 +24,22 @@ export const Login = () => {
         password: "brandnewplayer"
     })
 
+    useEffect(()=>{
+        getGames().then(games => {setGame(games[0])})
+        getAssets().then(assets => {setAssets(assets)})
+    },[])
+
+    useEffect(
+        () => {
+            if (assets.length > 0) {
+
+                assets?.forEach(asset => {
+                    if (asset.id === game.background_asset) {
+                        setBackground(asset)
+                    }
+                })
+            }
+        }, [game, assets])
 
     useEffect(()=>{
         const canvas = canvas1.current
@@ -30,7 +50,7 @@ export const Login = () => {
         class Background {
             constructor(width, height) {
                 this.image = new Image()
-                this.image.src = background
+                this.image.src = "http://localhost:8000" + background.file
                 this.imageWidth = 7087
                 this.imageHeight = 3986
                 this.height = height
@@ -61,7 +81,7 @@ export const Login = () => {
             requestAnimationFrame(animate)
         }
         animate()
-    },[])
+    },[background])
 
 
 
@@ -94,7 +114,7 @@ export const Login = () => {
         <>
             <Canvas ref={canvas1}></Canvas>
         <Main>
-                    <Title>Your Game Here</Title>
+                    <Title>{game?.name}</Title>
                 <Form className="form--login" onSubmit={handleLogin}>
                     <H2>Please sign in</H2>
                     <span>

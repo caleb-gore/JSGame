@@ -139,17 +139,18 @@ export const Saves = () => {
         let deleteButtons = [];
         saveGames.map((save) => {
             deleteButtons.push(
-                <button
+                <Button
                     key={"delete--" + save.id}
                     onClick={() => {
                         // SET OBJECT FOR DELETION
                         setFileToBeDeleted(save);
                         // OPEN CONFIRM DELETE MODAL
                         confirmDeleteDialog.current.showModal();
+                        deleteDialog.current.close()
                     }}
                 >
                     Slot {saveGames.indexOf(save) + 1} score: {save.score}
-                </button>
+                </Button>
             );
         });
         return deleteButtons;
@@ -158,30 +159,33 @@ export const Saves = () => {
     return (
         <Main>
             {/* DELETE BUTTON MODAL */}
-            <dialog
+            <Dialog
                 key={"deleteDialog"}
                 className="dialog dialog--delete"
                 ref={deleteDialog}
             >
-                <div>Choose A File To Delete:</div>
+                <Title>Choose A File To Delete:</Title>
                 {/* DISPLAY BUTTONS FOR EACH SAVED GAME */}
                 {deleteButtons()}
-                <button
+                <div>
+
+                <Button
                     className="button--close"
                     onClick={(e) => deleteDialog.current.close()}
                 >
                     Close
-                </button>
-            </dialog>
+                </Button>
+                </div>
+            </Dialog>
 
             {/* CONFIRM DELETE MODAL */}
-            <dialog
+            <Dialog
                 key={"confirmDeleteDialog"}
                 className="dialog dialog--confirmDelete"
                 ref={confirmDeleteDialog}
             >
-                <div>Delete This File? (This Cannot Be Undone)</div>
-                <button
+                <Title>Delete This File?</Title>
+                <Button
                     onClick={(e) => {
                         confirmDeleteDialog.current.close();
                         deleteDialog.current.close();
@@ -193,8 +197,8 @@ export const Saves = () => {
                     }}
                 >
                     Delete
-                </button>
-                <button
+                </Button>
+                <Button
                     className="button--close"
                     onClick={(e) => {
                         // CLEAR FILE TO BE DELETED
@@ -203,8 +207,8 @@ export const Saves = () => {
                     }}
                 >
                     Close
-                </button>
-            </dialog>
+                </Button>
+            </Dialog>
 
             <Title>Save Files</Title>
 
@@ -236,6 +240,15 @@ const Div = styled.div`
     align-items: center;
     margin-top: 40px;
 `;
+
+const Dialog = styled.dialog`
+background-color: grey;
+text-align: center;
+
+border:8px outset #999;
+    -webkit-box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+    -moz-box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+`
 
 const Title = styled.h1`
     text-align: center;

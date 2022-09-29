@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
+import { getGames } from "../../../managers/GameManager";
 import {
     createAwardedTrophy,
     getSingleSave,
@@ -26,12 +27,14 @@ export const SideScroll = () => {
     const [backgroundAsset, setBackground] = useState({});
     const [enemyAsset, setEnemy] = useState({});
     const [saveId, setSaveId] = useState(0);
+    const [game, setGame] = useState(undefined);
     const inputs = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", 'Escape ', 'Enter'];
 
     useEffect(() => {
         setSaveId(JSON.parse(localStorage.getItem("saveGame")));
         getAssets().then(setAssets);
         getTrophies().then(setTrophies);
+        getGames().then(games => setGame(games[0]));
     }, []);
 
     useEffect(() => {
@@ -41,21 +44,22 @@ export const SideScroll = () => {
     }, [saveId]);
 
     useEffect(() => {
-        if (saveGame.id > 0) {
+        
+        if (saveGame.id > 0 && game !== undefined) {
             assets?.forEach((asset) => {
-                if (asset?.name === "red-dragon") {
+                if (asset?.id === game?.character_asset) {
                     setCharacter(asset);
                     console.log(asset);
-                } else if (asset?.name === "pink") {
+                } else if (asset?.id === game?.background_asset) {
                     setBackground(asset)
                     console.log(asset);;
-                } else if (asset?.name === "enemy-dragon") {
+                } else if (asset?.id === game?.enemy_asset) {
                     setEnemy(asset);
                     console.log(asset);
                 }
             });
         }
-    }, [assets, saveGame, trophies]);
+    }, [assets, saveGame, trophies, game]);
 
     /* run game after all assets are set */
     useEffect(() => {
@@ -108,7 +112,7 @@ export const SideScroll = () => {
                 this.image = new Image();
                 this.image.src = "http://localhost:8000" + characterAsset.file;
                 this.frameX = 0;
-                this.maxFrame = 11;
+                this.maxFrame = characterAsset.frames -1;
                 this.fps = 20;
                 this.frameY = 0;
                 this.frameTimer = 0;
@@ -270,7 +274,7 @@ export const SideScroll = () => {
                 this.directionX = Math.random() * 3 + 2
                 this.directionY = Math.random() * 3 + 2.5;
                 this.frameX = 0;
-                this.maxFrame = 10;
+                this.maxFrame = enemyAsset.frames - 1;
                 this.fps = 20;
                 this.frameTimer = 0;
                 this.frameInterval = 1000 / this.fps;
@@ -346,13 +350,13 @@ export const SideScroll = () => {
         const handleTrophies = () => {
             trophies.forEach(object => {
                 const wonTrophy = trophiesWon.find(trophy => trophy.id === object.id) 
-                if (!wonTrophy && object.id === 1 && score === 5 && lives === 3) {
+                if (!wonTrophy && object.id === 1 && score === 3 && lives === 3) {
                     trophiesWon.push(object)
                     console.log(trophiesWon);
-                } else if (!wonTrophy && object.id === 2 && score === 10 && lives === 3) {
+                } else if (!wonTrophy && object.id === 2 && score === 5 && lives === 3) {
                     trophiesWon.push(object)
                     console.log(trophiesWon);
-                } else if (!wonTrophy && object.id === 3 && score === 15 && lives === 3) {
+                } else if (!wonTrophy && object.id === 3 && score === 7 && lives === 3) {
                     trophiesWon.push(object)
                     console.log(trophiesWon);
                 }
@@ -520,11 +524,17 @@ export const SideScroll = () => {
         
     };
 
-    return (
-        <Canvas ref={canvas1}></Canvas>
-        // <Main>
-        // </Main>
-    );
+    const displayCanvas = () => {
+        if (saveGame !== {} && characterAsset !== {} && backgroundAsset !== {} && enemyAsset !== {}) {
+            return <Canvas ref={canvas1}></Canvas>
+        } else {
+            return <div>Loading...</div>
+        }
+    }
+
+    return <>
+    {displayCanvas()}
+    </>
 };
 
 

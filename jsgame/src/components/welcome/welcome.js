@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import background from './background2.jpg'
+import { getAssets } from "../../managers/AssetManager";
+import { getGames } from "../../managers/GameManager";
+
 
 
 
@@ -14,12 +16,28 @@ export const Welcome = () => {
 
     const canvas1 = useRef()
     const navigate = useNavigate()
-    
-    
+    const [game, setGame] = useState({})
+    const [assets, setAssets] = useState([])
+    const [background, setBackground] = useState({})
 
     useEffect(()=>{
+    getGames().then(games => {setGame(games[0])})
+    getAssets().then(assets => {setAssets(assets)})
+    },[])
 
+    useEffect(
+        () => {
+            if (assets.length > 0) {
 
+                assets?.forEach(asset => {
+                    if (asset.id === game.background_asset) {
+                        setBackground(asset)
+                    }
+                })
+            }
+        }, [game, assets])
+
+    useEffect(()=>{
         const canvas = canvas1.current
         const ctx = canvas.getContext('2d')
         const width = canvas.width = window.innerWidth
@@ -28,7 +46,7 @@ export const Welcome = () => {
         class Background {
             constructor(width, height) {
                 this.image = new Image()
-                this.image.src = background
+                this.image.src = "http://localhost:8000" + background.file
                 this.imageWidth = 7087
                 this.imageHeight = 3986
                 this.height = height
@@ -60,13 +78,13 @@ export const Welcome = () => {
             // audio.play()
         }
         animate()
-    },[])
+    },[background])
     
     return (
         <>
             <Canvas ref={canvas1}></Canvas>
         <Main>
-            <Title>Your Game Here</Title>
+            <Title>{game?.name}</Title>
             <Div>
             <Button onClick={()=> navigate("/register")}>New Player</Button>
             <Button onClick={()=> navigate("/login")}>Returning Player</Button>

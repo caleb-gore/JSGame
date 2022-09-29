@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getAssets } from "../../../managers/AssetManager";
-import { deleteGame, getGames } from "../../../managers/GameManager";
+import { deleteGame, getGames, updateGame } from "../../../managers/GameManager";
 
 export const GamesList = () => {
     const editGame = useRef();
     const [games, setGames] = useState([]);
     const [openGame, updateOpenGame] = useState({});
     const [assets, setAssets] = useState([]);
+    const navigate = useNavigate()
 
     useEffect(() => {
         getGames().then(setGames);
@@ -20,9 +22,21 @@ export const GamesList = () => {
                 <h2>edit game</h2>
                 <form>
                     <label htmlFor="name">Name</label>
-                    <input placeholder="Name" value={openGame.name} />
+                    <input onChange={
+                        (event) => {
+                            const copy = {...openGame}
+                            copy.name = event.target.value
+                            updateOpenGame(copy)
+                        }
+                    } placeholder="Name" value={openGame.name}/>
                     <label htmlFor="background">Background</label>
-                    <select>
+                    <select onChange={
+                        (event) => {
+                            const copy = {...openGame}
+                            copy.background_asset = parseInt(event.target.value)
+                            updateOpenGame(copy)
+                        }
+                    }>
                        {assets.map(asset => {
                         if (asset.type === "background" && asset.id === openGame.background_asset) {
                             return <option value={asset.id} selected>{asset.name}</option>;
@@ -32,7 +46,13 @@ export const GamesList = () => {
                        })};
                     </select>
                     <label htmlFor="character">Character</label>
-                    <select>
+                    <select onChange={
+                        (event) => {
+                            const copy = {...openGame}
+                            copy.character_asset = parseInt(event.target.value)
+                            updateOpenGame(copy)
+                        }
+                    }>
                        {assets.map(asset => {
                         if (asset.type === "character" && asset.id === openGame.character_asset) {
                             return <option value={asset.id} selected>{asset.name}</option>;
@@ -42,7 +62,13 @@ export const GamesList = () => {
                        })};
                     </select>
                     <label htmlFor="enemy">Enemy</label>
-                    <select>
+                    <select onClick={
+                        (event) => {
+                            const copy = {...openGame}
+                            copy.enemy_asset = parseInt(event.target.value)
+                            updateOpenGame(copy)
+                        }
+                    }>
                        {assets.map(asset => {
                         if (asset.type === "enemy" && asset.id === openGame.enemy_asset) {
                             return <option value={asset.id} selected>{asset.name}</option>;
@@ -51,6 +77,17 @@ export const GamesList = () => {
                         }
                        })};
                     </select>
+                    <button
+                        onClick={
+                            evt => {
+                                evt.preventDefault();
+                                updateGame(openGame, openGame.id).then(() => {
+                                    getGames().then(setGames);
+                                });
+                                editGame.current.close();
+                            }
+                        }
+                        >Update</button>
                 </form>
                 <button onClick={() => editGame.current.close()}>close</button>
             </dialog>

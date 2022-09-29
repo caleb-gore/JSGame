@@ -14,7 +14,7 @@ export const saveAsset = (asset) => {
 export const getAssets = () => {
     return fetch("http://localhost:8000/assets", {
         headers:{
-            "Authorization": `Token ${localStorage.getItem("u_token")}`
+            // "Authorization": `Token ${localStorage.getItem("u_token")}`
         }
     })
         .then(response => response.json())

@@ -4,12 +4,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { getAssets } from "../../managers/AssetManager";
 import { registerUser } from "../../managers/AuthManager";
-import background from '../welcome/background2.jpg'
+import { getGames } from "../../managers/GameManager";
 
 
 // COMPONENT
 export const Register = () => {
+    const [game, setGame] = useState({})
+    const [assets, setAssets] = useState([])
+    const [background, setBackground] = useState({})
     const canvas1 = useRef()
     const username = useRef();
     const password = useRef();
@@ -18,6 +22,24 @@ export const Register = () => {
     const navigate = useNavigate();
     // const [is_staff, setIsStaff] = useState("")
     
+    useEffect(
+        () => {
+            getGames().then(games => {setGame(games[0])})
+            getAssets().then(assets => {setAssets(assets)})
+        }
+    ,[])
+    
+    useEffect(
+        () => {
+            if (assets.length > 0) {
+
+                assets?.forEach(asset => {
+                    if (asset.id === game.background_asset) {
+                        setBackground(asset)
+                    }
+                })
+            }
+        }, [game, assets])
     
     useEffect(()=>{
         const canvas = canvas1.current
@@ -28,7 +50,7 @@ export const Register = () => {
         class Background {
             constructor(width, height) {
                 this.image = new Image()
-                this.image.src = background
+                this.image.src = "http://localhost:8000" + background.file
                 this.imageWidth = 7087
                 this.imageHeight = 3986
                 this.height = height
@@ -59,7 +81,7 @@ export const Register = () => {
             requestAnimationFrame(animate)
         }
         animate()
-    },[])
+    },[background])
     
     
     /* SAVE REGISTRATION DATA AS NEW USER OBJECT
@@ -90,7 +112,7 @@ export const Register = () => {
             <Canvas ref={canvas1}></Canvas>
         <Main>
             <>
-                <Title className="title">Your Game Here</Title>
+                <Title className="title">{game?.name}</Title>
             {/* PASSWORD MISMATCH MODAL */}
             <dialog className="dialog dialog--password" ref={passwordDialog}>
                 <div>Passwords do not match</div>
